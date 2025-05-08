@@ -1,5 +1,6 @@
 # Pygame DesSoft
 
+Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte de uma atividade acadêmica. Foi implementado em Python utilizando a biblioteca Pygame, com o objetivo de explorar conceitos de programação, lógica de jogos e design interativo. Todos os recursos gráficos e sonoros utilizados foram obtidos de fontes livres e abertas disponíveis na internet, respeitando as licenças de uso e promovendo o uso ético de conteúdo digital.
 
 ## 1. Fluxo de trabalho com Git – Pull Requests e Issues
 
