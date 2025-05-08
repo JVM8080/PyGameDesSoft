@@ -37,4 +37,8 @@ git push origin sua-feature-aqui
 
 - O Admin irá testar o PR, e posteriormente aceitar ou recusar. Se tiver algum erro será comunicado pelo grupo de Whats.
 
----
+
+
+## 2. Fontes usadas no trabalho
+
+Exemplo: A função `funcao-do-jogo()` do arquivo   `diretorio/arquivo.py` foi desenvolvida pela IA [www.blackbox.ai](https://www.blackbox.ai/).
