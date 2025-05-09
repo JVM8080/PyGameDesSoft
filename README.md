@@ -9,22 +9,22 @@ Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte
 1. **Crie uma branch a partir da `main`:**
 
 ```bash
-git checkout main
-git pull origin main
-git checkout -b sua-feature-aqui
+git checkout main #Volta pra branch main
+git pull origin main #Sincroniza o repositorio
+git checkout -b sua-feature-aqui # Cria a branch donde vc quer trabalhar
 ```
 
 2. **Desenvolva e faça commits claros (exemplo):**
 
 ```bash
-git add .
-git commit -m "feat: adiciona tela de contato"
+git add . # Adiciona as mudanças do diretorio atual
+git commit -m "feat: adiciona tela de contato" #Cria o commit
 ```
 
 3. **Suba sua branch:**
 
 ```bash
-git push origin sua-feature-aqui
+git push origin sua-feature-aqui #Envia a branch com os commit para criar o Pull Request (PR) no Github 
 ```
 
 4. **Abra um Pull Request no GitHub:**
