@@ -39,8 +39,8 @@ PyGameDesSoft/
 │       ├── collision.py   # Sistema de detecção de colisões
 │       └── asset_loader.py # Carregador de recursos (imagens, sons)
 │
-└── requirements.txt       # Dependências do projeto (pygame etc.)
 └── README.md              # Arquivo Readme
+└── requirements.txt       # Dependências do projeto (pygame etc.)
 ```
 
 ## 1. Ambiente virtual de Python
