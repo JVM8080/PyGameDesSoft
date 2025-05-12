@@ -1,0 +1,6 @@
+WIDTH = 800
+HEIGHT = 600
+FPS = 60
+ASSET_PATH = "assets/"
+IMG_PATH = ASSET_PATH + "images/"
+SOUND_PATH = ASSET_PATH + "sounds/"

@@ -13,9 +13,6 @@ Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte
 ```
 PyGameDesSoft/
 │
-├── main.py                # Ponto de entrada principal do jogo (inicialização e loop principal)
-├── config.py              # Arquivo de configurações globais (resolução, FPS, caminhos etc.)
-│
 ├── assets/                # Pasta para recursos do jogo (imagens, sons, fontes)
 │   ├── images/
 │   │   ├── background.png
@@ -25,22 +22,35 @@ PyGameDesSoft/
 │   └── fonts/
 │
 ├── src/                   # Código fonte principal do jogo
+│   ├── __init__.py        # Arquivo __init__.py para permitir a importação dos módulos da pasta.
 │   ├── screens/           # Telas do jogo (cada uma em um arquivo separado)
-│   │   ├── init.py
+│   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
 │   │   ├── main_menu.py   # Tela inicial do jogo com botão de play
 │   │   ├── level_select.py # Tela de seleção de nível/mapa
 │   │   └── game_screen.py # Tela principal do jogo
 │   │
 │   ├── objects/           # Classes dos objetos do jogo
+│   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
 │   │   ├── player.py      # Classe do jogador principal
 │   │   └── obstacles.py   # Classe dos obstáculos
 │   │
-│   └── utils/             # Utilitários do jogo
-│       ├── collision.py   # Sistema de detecção de colisões
-│       └── asset_loader.py # Carregador de recursos (imagens, sons)
+│   ├── utils/             # Utilitários do jogo
+│   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
+│   │   ├── collision.py   # Sistema de detecção de colisões
+│   │   └── asset_loader.py # Carregador de recursos (imagens, sons)
+│   │
+│   ├── levels/            # Níveis do jogo
+│   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
+│   │   ├── level_1.py     # Nível 1
+│   │   ├── level_2.py     # Nível 2
+│   │   └── level_3.py     # Nível 3
 │
+├── .gitignore             # Arquivos ignorados no repositorio
+├── config.py              # Arquivo de configurações globais (resolução, FPS, caminhos etc.)
+├── main.py                # Ponto de entrada principal do jogo (inicialização e loop principal)
 └── README.md              # Arquivo Readme
 └── requirements.txt       # Dependências do projeto (pygame etc.)
+
 ```
 
 ## 1. Ambiente virtual de Python
@@ -103,3 +113,4 @@ git push origin sua-feature-aqui #Envia a branch com os commit para criar o Pull
 Exemplo: A função `funcao-do-jogo()` do arquivo   `diretorio/arquivo.py` foi desenvolvida pela IA [www.blackbox.ai](https://www.blackbox.ai/).
 
 * A estrutura de pastas e arquivos foi obtida pela IA [chat.deepseek.com](chat.deepseek.com).
+* Os arquivos iniciais do repositorio foram obtidos pela IA [chatgpt.com](https://chatgpt.com/).
