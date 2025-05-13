@@ -6,6 +6,7 @@
 * Sophia Montecinos Kalil.
 * Felipe Campos Leite Lima.
 
+
 Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte de uma atividade acadêmica. Foi implementado em Python utilizando a biblioteca Pygame, com o objetivo de explorar conceitos de programação, lógica de jogos e design interativo. Todos os recursos gráficos e sonoros utilizados foram obtidos de fontes livres e abertas disponíveis na internet, respeitando as licenças de uso e promovendo o uso ético de conteúdo digital.
 
 ## Estrutura de pastas e arquivos
@@ -114,3 +115,5 @@ Exemplo: A função `funcao-do-jogo()` do arquivo   `diretorio/arquivo.py` foi d
 
 * A estrutura de pastas e arquivos foi obtida pela IA [chat.deepseek.com](chat.deepseek.com).
 * Os arquivos iniciais do repositorio foram obtidos pela IA [chatgpt.com](https://chatgpt.com/).
+* Os recursos gráficos foram obtidos no link a seguir: https://novastarlyght.itch.io/gravity-falls-pinesquest-2d
+
