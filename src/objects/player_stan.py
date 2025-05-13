@@ -2,6 +2,7 @@ import pygame
 from config import HEIGHT
 from src.utils.asset_loader import load_image
 from pygame import mixer
+from src.objects.power import PoderBase
 
 JUMP_SOUND = None
 
@@ -38,17 +39,40 @@ class Player:
         self.gravity = 0.3
         self.on_ground = False
 
+        self.poder_group = pygame.sprite.Group()
+        self.moeda_spritesheet = load_image("stan/poder moedas.png").convert_alpha()
+
+        # Valores fixos da sua imagem
+        self.moeda_frame_width = self.moeda_spritesheet.get_width() // 6
+        self.moeda_frame_height = self.moeda_spritesheet.get_height()
+
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 50
 
+        self.z_pressed_last_frame = False
+
     def update(self, keys):
         now = pygame.time.get_ticks()
         elapsed_ticks = now - self.last_update
 
         dx = 0
+        # Verifica se a tecla Z foi pressionada agora (e não estava no frame anterior)
+        if keys[pygame.K_z] and not self.z_pressed_last_frame:
+            direction = 1 if keys[pygame.K_RIGHT] else -1
+            moeda = PoderBase(self.rect.centerx, self.rect.centery,
+                            direction,
+                            self.moeda_spritesheet,
+                            frame_count=6,
+                            frame_width=self.moeda_frame_width,
+                            frame_height=self.moeda_frame_height)
+            self.poder_group.add(moeda)
+
+        # Atualiza o estado da tecla Z para o próximo frame
+        self.z_pressed_last_frame = keys[pygame.K_z]
+
 
         if keys[pygame.K_LEFT]:
             dx = -self.speed
@@ -88,8 +112,15 @@ class Player:
             self.vel_y = 0
             self.on_ground = True
 
+        self.poder_group.update()
+
+
     def reset_position(self):
         self.rect.topleft = (100, HEIGHT - 150)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+        self.poder_group.draw(screen)
+
+
+        
