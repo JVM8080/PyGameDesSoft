@@ -1,6 +1,6 @@
 import pygame
 from src.objects.player import Player
-from config import HEIGHT
+from config import HEIGHT, FPS
 
 def run(screen):
     clock = pygame.time.Clock()
@@ -20,4 +20,4 @@ def run(screen):
         screen.fill((100, 200, 100)) 
         player.draw(screen)
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(FPS)
