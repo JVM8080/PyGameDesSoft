@@ -1,10 +1,16 @@
 import pygame
-from src.objects.player import Player
+from src.objects.dipper import Player
 from config import HEIGHT
 
 def run(screen):
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 150)
+
+    joystick = None
+    pygame.joystick.init()
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
 
     running = True
     while running:
@@ -15,7 +21,7 @@ def run(screen):
                 return 'menu'
 
         keys = pygame.key.get_pressed()
-        player.update(keys)
+        player.update(keys=keys, joystick=joystick)
 
         screen.fill((180, 80, 150)) 
         player.draw(screen)
