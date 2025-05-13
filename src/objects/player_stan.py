@@ -10,9 +10,9 @@ class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
 
-        self.image_idle = load_image("stan/stan parado.png").convert_alpha()
-        self.anim_left = load_image('stan/stan indo pra esquerda.png').convert_alpha()
-        self.anim_right = load_image('stan/stan indo pra direita.png').convert_alpha()
+        self.image_idle = load_image("level2/stan/stan parado.png").convert_alpha()
+        self.anim_left = load_image('level2/stan/stan indo pra esquerda.png').convert_alpha()
+        self.anim_right = load_image('level2/stan/stan indo pra direita.png').convert_alpha()
 
         frame_width = self.anim_left.get_width()//3
         frame_height = self.anim_left.get_height()
@@ -40,7 +40,7 @@ class Player:
         self.on_ground = False
 
         self.poder_group = pygame.sprite.Group()
-        self.moeda_spritesheet = load_image("stan/poder moedas.png").convert_alpha()
+        self.moeda_spritesheet = load_image("level2/stan/poder moedas.png").convert_alpha()
 
         # Valores fixos da sua imagem
         self.moeda_frame_width = self.moeda_spritesheet.get_width() // 6

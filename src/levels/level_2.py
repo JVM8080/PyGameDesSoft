@@ -18,6 +18,8 @@ def run(screen):
         player.update(keys)
 
         screen.fill((100, 200, 100)) 
+        background = pygame.image.load('level2/cenario level 2.png').convert()
+        screen.blit(background, (0, 0)) 
         player.draw(screen)
         pygame.display.flip()
         clock.tick(60)
