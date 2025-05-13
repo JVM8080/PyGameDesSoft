@@ -9,10 +9,9 @@ JUMP_SOUND = None
 class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
-        self.image = load_image("player.png", size=(40, 40))
+        self.image = load_image("player.png", size=(40, "auto"))
         self.rect = self.image.get_rect(topleft=(x, y))
 
-        # Movimiento y física
         self.vel_y = 0
         self.speed = 2
         self.jump_force = -8
@@ -20,7 +19,6 @@ class Player:
         self.on_ground = False
         self.facing_right = True
 
-        # Teletransporte
         self.teleporting = False
         self.teleport_target_x = None
         self.teleport_frames = 0
@@ -31,8 +29,6 @@ class Player:
         self.teleport_cooldown = 0
         self.teleport_cooldown_max = FPS/3
 
-
-        # Ataques
         self.projectiles = []
         self.special_attacks = []
         self.shoot_cooldown = 0
@@ -122,14 +118,14 @@ class Player:
 
     def activate_teleport(self):
         if self.teleport_cooldown > 0:
-            return  # No hacer nada si está en cooldown
+            return  
 
         offset = 120
         self.teleport_target_x = self.rect.x + (offset if self.facing_right else -offset)
         self.teleport_frames = 0
         self.teleporting = True
         self.blink_timer = 0
-        self.teleport_cooldown = self.teleport_cooldown_max  # Inicia el cooldown
+        self.teleport_cooldown = self.teleport_cooldown_max 
 
         if not self.on_ground:
             self.has_teleported_in_air = True
@@ -140,7 +136,7 @@ class Player:
             self.teleport_frames += 1
             self.blink_timer += 1
 
-            # Efecto de parpadeo
+            
             if self.blink_timer >= 2:
                 self.visible = not self.visible
                 self.blink_timer = 0
@@ -162,7 +158,7 @@ class Player:
 
     def handle_attacks(self, keys, joystick):
         toggle_key = keys and keys[pygame.K_a]
-        toggle_button = joystick and joystick.get_button(4)  # LB
+        toggle_button = joystick and joystick.get_button(4)  
 
         toggle_input = toggle_key or toggle_button
         if toggle_input and not self.prev_toggle_input:
