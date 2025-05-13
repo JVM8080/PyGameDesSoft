@@ -8,7 +8,7 @@ JUMP_SOUND = None
 class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
-        self.image = load_image("mabel.png", size=(40, 40))
+        self.image = load_image("mabel/mabel.png", size=(40, 40))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.vel_y = 0
         self.speed = 1
@@ -22,12 +22,9 @@ class Player:
         dx = 0
         if keys[pygame.K_LEFT]:
             dx = -self.speed
-            self.image = load_image("mabel indo pra esquerda.png", size=(40, 40))
         if keys[pygame.K_RIGHT]:
             dx = self.speed
-            self.image = load_image("mabel indo pra direita.png", size=(40, 40))
         if keys[pygame.K_SPACE] and self.on_ground:
-            self.image = load_image("mabel.png", size=(40, 40))
             self.vel_y = self.jump_force
             self.on_ground = False
             JUMP_SOUND.play()
