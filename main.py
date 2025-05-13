@@ -9,6 +9,15 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("PyGameDesSoft")
 clock = pygame.time.Clock()
+pygame.joystick.init()
+
+if pygame.joystick.get_count() > 0:
+    joystick = pygame.joystick.Joystick(0)
+    joystick.init()
+    print("Joystick conectado:", joystick.get_name())
+else:
+    joystick = None
+    print("No hay joystick conectado")
 
 state = 'menu'
 selected_level = 1
