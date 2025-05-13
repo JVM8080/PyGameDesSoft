@@ -1,6 +1,6 @@
 import pygame
 from pygame import mixer
-from config import HEIGHT
+from config import HEIGHT, FPS
 from src.utils.asset_loader import load_image
 from src.objects.projectile import Projectile, EnergyBall 
 
@@ -28,6 +28,9 @@ class Player:
         self.visible = True
         self.blink_timer = 0
         self.has_teleported_in_air = False
+        self.teleport_cooldown = 0
+        self.teleport_cooldown_max = FPS/3
+
 
         # Ataques
         self.projectiles = []
@@ -35,7 +38,7 @@ class Player:
         self.shoot_cooldown = 0
         self.shoot_cooldown_max = 20
         self.special_cooldown = 0
-        self.special_cooldown_max = 60
+        self.special_cooldown_max = 30
 
         self.use_special_attack = False
         self.prev_toggle_input = False
@@ -98,6 +101,9 @@ class Player:
         self.handle_cooldowns()
         self.handle_attacks(keys, joystick)
         self.update_projectiles()
+        if self.teleport_cooldown > 0:
+            self.teleport_cooldown -= 1
+
         
     def _normalize_to_8_directions(self, vector):
         x, y = vector.x, vector.y
@@ -115,13 +121,19 @@ class Player:
 
 
     def activate_teleport(self):
+        if self.teleport_cooldown > 0:
+            return  # No hacer nada si está en cooldown
+
         offset = 120
         self.teleport_target_x = self.rect.x + (offset if self.facing_right else -offset)
         self.teleport_frames = 0
         self.teleporting = True
         self.blink_timer = 0
+        self.teleport_cooldown = self.teleport_cooldown_max  # Inicia el cooldown
+
         if not self.on_ground:
             self.has_teleported_in_air = True
+
 
     def handle_teleport(self):
         if self.teleporting:
