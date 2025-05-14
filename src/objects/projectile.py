@@ -57,7 +57,6 @@ class Projectile:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-
 class EnergyBall(Projectile):
     def __init__(self, x, y, direction):
         super().__init__(x, y, direction, play_sound=False)  
