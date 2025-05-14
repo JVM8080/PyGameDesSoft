@@ -65,6 +65,10 @@ class Player:
 
             if movement_vector.length_squared() > 0.1:
                 self.aim_direction = self._normalize_to_8_directions(movement_vector)
+            else:
+                if abs(self.aim_direction.x) < 1 or abs(self.aim_direction.y) > 0:
+                    self.aim_direction = pygame.math.Vector2(1 if self.facing_right else -1, 0)
+
 
             if not self.aim_locked and abs(axis_x) > 0.1:
                 dx = axis_x * self.speed * 2
@@ -165,7 +169,6 @@ class Player:
             self.use_special_attack = not self.use_special_attack
         self.prev_toggle_input = toggle_input
 
-        # Disparo (tecla Z o botón X)
         shoot_key = keys and keys[pygame.K_z]
         shoot_button = joystick and joystick.get_button(2)
 
