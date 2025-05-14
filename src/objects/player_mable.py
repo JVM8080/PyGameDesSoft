@@ -11,8 +11,8 @@ class Player:
         global JUMP_SOUND
 
         self.image_idle = load_image("mabel/mabel.png",size=(60,"auto"))
-        self.anim_left = load_image('mabel/mabel indo pra esquerda.png')
-        self.anim_right = load_image('mabel/mabel pra direita.png')
+        self.anim_left = load_image('mabel/mabel indo pra esquerda.png').convert_alpha()
+        self.anim_right = load_image('mabel/mabel pra direita.png').convert_alpha()
 
         # Cálculo correto para cada spritesheet
         frame_width_left = self.anim_left.get_width() // 3
@@ -44,10 +44,17 @@ class Player:
         self.on_ground = False
 
         self.poder_group = pygame.sprite.Group()
-        self.moeda_spritesheet = load_image("stan/poder moedas.png").convert_alpha()
+        estrela_original = load_image("mabel/estrela_poder_transparente.png").convert_alpha()
 
-        self.moeda_frame_width = self.moeda_spritesheet.get_width() // 6
-        self.moeda_frame_height = self.moeda_spritesheet.get_height()
+        # Reduz o tamanho da estrela em 25 vezes
+        reduzida_w = estrela_original.get_width() // 25
+        reduzida_h = estrela_original.get_height() // 25
+
+        self.estrela_direita = pygame.transform.scale(estrela_original, (reduzida_w, reduzida_h))
+        self.estrela_esquerda = pygame.transform.flip(self.estrela_direita, True, False)
+
+        self.estrela_frame_width = reduzida_w
+        self.estrela_frame_height = reduzida_h
 
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
@@ -64,17 +71,18 @@ class Player:
         dx = 0
 
         if keys[pygame.K_z] and not self.z_pressed_last_frame:
-            direction = 1 if keys[pygame.K_RIGHT] else -1
-            moeda = PoderBase(
+            direction = 1 if keys[pygame.K_RIGHT] else -1 if keys[pygame.K_LEFT] else 1
+            estrela_sprite = self.estrela_esquerda if direction == 1 else self.estrela_direita
+            estrela = PoderBase(
                 self.rect.centerx,
                 self.rect.centery,
                 direction,
-                self.moeda_spritesheet,
-                frame_count=6,
-                frame_width=self.moeda_frame_width,
-                frame_height=self.moeda_frame_height
+                estrela_sprite,
+                frame_count=1,
+                frame_width=self.estrela_frame_width,
+                frame_height=self.estrela_frame_height
             )
-            self.poder_group.add(moeda)
+            self.poder_group.add(estrela)
 
         self.z_pressed_last_frame = keys[pygame.K_z]
 
@@ -91,7 +99,7 @@ class Player:
                 self.last_update = now
                 self.frame_right = (self.frame_right + 1) % len(self.mabel_anim_right)
                 self.image = self.mabel_anim_right[self.frame_right]
-        
+
         else:
             self.image = self.image_idle
 
