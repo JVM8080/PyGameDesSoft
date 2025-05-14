@@ -44,6 +44,27 @@ class Player:
 
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
+            
+        self.image_idle = load_image("dipper/dipper_parado.png", size=(40, "auto"))
+        self.anim_right = load_image("dipper/dipper_indo_pra_direita.png")
+        self.anim_left = load_image("dipper/dipper_indo_pra_esquerda.png")
+
+        self.frame_width = self.anim_right.get_width() // 3
+        self.frame_height = self.anim_right.get_height()
+
+        self.walk_right_frames = [
+            self.anim_right.subsurface(i * self.frame_width, 0, self.frame_width, self.frame_height)
+            for i in range(3)
+        ]
+        self.walk_left_frames = [
+            self.anim_left.subsurface(i * self.frame_width, 0, self.frame_width, self.frame_height)
+            for i in range(3)
+        ]
+
+        self.frame_index = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_interval = 100 
+
 
     def update(self, keys=None, joystick=None):
         dx = 0
@@ -91,6 +112,22 @@ class Player:
         self.rect.y += dy
 
         self.handle_teleport()
+        
+        now = pygame.time.get_ticks()
+        moving = abs(dx) > 0.1
+
+        if moving:
+            if now - self.last_update > self.frame_interval:
+                self.last_update = now
+                self.frame_index = (self.frame_index + 1) % len(self.walk_right_frames)
+
+            if self.facing_right:
+                self.image = self.walk_right_frames[self.frame_index]
+            else:
+                self.image = self.walk_left_frames[self.frame_index]
+        else:
+            self.image = self.image_idle
+
 
         if self.rect.bottom >= HEIGHT - 50:
             self.rect.bottom = HEIGHT - 50
