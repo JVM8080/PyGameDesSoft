@@ -10,9 +10,9 @@ class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
 
-        self.image_idle = load_image("mabel/mabel.png").convert_alpha()
-        self.anim_left = load_image('mabel/mabel indo pra esquerda.png').convert_alpha()
-        self.anim_right = load_image('mabel/mabel pra direita.png').convert_alpha()
+        self.image_idle = load_image("mabel/mabel.png",size=(60,"auto"))
+        self.anim_left = load_image('mabel/mabel indo pra esquerda.png')
+        self.anim_right = load_image('mabel/mabel pra direita.png')
 
         # Cálculo correto para cada spritesheet
         frame_width_left = self.anim_left.get_width() // 3
