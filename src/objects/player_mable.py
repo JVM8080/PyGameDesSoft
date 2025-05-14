@@ -10,21 +10,25 @@ class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
 
-        self.image_idle = load_image("mabel/mabel.png").convert_alpha()
-        self.anim_left = load_image('mabel/mabel indo pra esquerda.png').convert_alpha()
-        self.anim_right = load_image('mabel/mabel pra direita.png').convert_alpha()
+        self.image_idle = load_image("mabel/mabel.png",size=(60,"auto"))
+        self.anim_left = load_image('mabel/mabel indo pra esquerda.png')
+        self.anim_right = load_image('mabel/mabel pra direita.png')
 
-        frame_width = self.anim_left.get_width()//3
-        frame_height = self.anim_left.get_height()
+        # Cálculo correto para cada spritesheet
+        frame_width_left = self.anim_left.get_width() // 3
+        frame_height_left = self.anim_left.get_height()
+
+        frame_width_right = self.anim_right.get_width() // 3
+        frame_height_right = self.anim_right.get_height()
 
         self.mabel_anim_left = []
         for i in range(3):
-            frame = self.anim_left.subsurface(i * frame_width, 0, frame_width, frame_height)
+            frame = self.anim_left.subsurface(pygame.Rect(i * frame_width_left, 0, frame_width_left, frame_height_left))
             self.mabel_anim_left.append(frame)
 
         self.mabel_anim_right = []
         for i in range(3):
-            frame = self.anim_right.subsurface(i * frame_width, 0, frame_width, frame_height)
+            frame = self.anim_right.subsurface(pygame.Rect(i * frame_width_right, 0, frame_width_right, frame_height_right))
             self.mabel_anim_right.append(frame)
 
         self.frame_left = 0
@@ -42,7 +46,6 @@ class Player:
         self.poder_group = pygame.sprite.Group()
         self.moeda_spritesheet = load_image("stan/poder moedas.png").convert_alpha()
 
-        # Valores fixos da sua imagem
         self.moeda_frame_width = self.moeda_spritesheet.get_width() // 6
         self.moeda_frame_height = self.moeda_spritesheet.get_height()
 
@@ -59,42 +62,38 @@ class Player:
         elapsed_ticks = now - self.last_update
 
         dx = 0
-        # Verifica se a tecla Z foi pressionada agora (e não estava no frame anterior)
+
         if keys[pygame.K_z] and not self.z_pressed_last_frame:
             direction = 1 if keys[pygame.K_RIGHT] else -1
-            moeda = PoderBase(self.rect.centerx, self.rect.centery,
-                            direction,
-                            self.moeda_spritesheet,
-                            frame_count=6,
-                            frame_width=self.moeda_frame_width,
-                            frame_height=self.moeda_frame_height)
+            moeda = PoderBase(
+                self.rect.centerx,
+                self.rect.centery,
+                direction,
+                self.moeda_spritesheet,
+                frame_count=6,
+                frame_width=self.moeda_frame_width,
+                frame_height=self.moeda_frame_height
+            )
             self.poder_group.add(moeda)
 
-        # Atualiza o estado da tecla Z para o próximo frame
         self.z_pressed_last_frame = keys[pygame.K_z]
-
 
         if keys[pygame.K_LEFT]:
             dx = -self.speed
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
-                self.frame_left += 1
-                if self.frame_left >= len(self.mabel_anim_left):
-                    self.frame_left = 0
+                self.frame_left = (self.frame_left + 1) % len(self.mabel_anim_left)
                 self.image = self.mabel_anim_left[self.frame_left]
 
         elif keys[pygame.K_RIGHT]:
             dx = self.speed
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
-                self.frame_right += 1
-                if self.frame_right >= len(self.mabel_anim_right):
-                    self.frame_right = 0
+                self.frame_right = (self.frame_right + 1) % len(self.mabel_anim_right)
                 self.image = self.mabel_anim_right[self.frame_right]
         
         else:
             self.image = self.image_idle
-
 
         if keys[pygame.K_SPACE] and self.on_ground:
             self.vel_y = self.jump_force
@@ -114,13 +113,9 @@ class Player:
 
         self.poder_group.update()
 
-
     def reset_position(self):
         self.rect.topleft = (100, HEIGHT - 150)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         self.poder_group.draw(screen)
-
-
-        
