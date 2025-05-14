@@ -1,5 +1,5 @@
 import pygame
-from src.objects.player import Player
+from src.objects.player_mable import Player
 from config import HEIGHT, FPS
 
 def run(screen):
