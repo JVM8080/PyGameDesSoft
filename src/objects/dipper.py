@@ -1,14 +1,17 @@
 import pygame
 from pygame import mixer
-from config import HEIGHT, FPS
+from config import HEIGHT, FPS, SOUND_VOLUME
 from src.utils.asset_loader import load_image
 from src.objects.projectile import Projectile, EnergyBall 
 
 JUMP_SOUND = None
+TELEPORT_SOUND = None
+
 
 class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
+        global TELEPORT_SOUND
         self.image = load_image("player.png", size=(40, "auto"))
         self.rect = self.image.get_rect(topleft=(x, y))
 
@@ -43,7 +46,11 @@ class Player:
         self.aim_locked = False  
 
         if not JUMP_SOUND:
-            JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
+            JUMP_SOUND = mixer.Sound("assets/sounds/dipper-jump.mp3")
+            
+        if not TELEPORT_SOUND:
+            TELEPORT_SOUND = mixer.Sound("assets/sounds/dipper-teleport.mp3")
+
             
         self.image_idle = load_image("dipper/dipper_parado.png", size=(40, "auto"))
         self.anim_right = load_image("dipper/dipper_indo_pra_direita.png")
@@ -114,6 +121,7 @@ class Player:
                 self.vel_y = self.jump_force
                 self.on_ground = False
                 self.has_teleported_in_air = False
+                JUMP_SOUND.set_volume(SOUND_VOLUME)
                 JUMP_SOUND.play()
 
             if joystick.get_button(3) and not self.teleporting and (self.on_ground or not self.has_teleported_in_air):
@@ -186,6 +194,8 @@ class Player:
 
         if not self.on_ground:
             self.has_teleported_in_air = True
+        TELEPORT_SOUND.set_volume(SOUND_VOLUME)
+        TELEPORT_SOUND.play()
 
 
     def handle_teleport(self):

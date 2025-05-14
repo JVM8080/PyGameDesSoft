@@ -1,20 +1,24 @@
 import pygame
+from config import SOUND_VOLUME
 from pygame import mixer
 from src.utils.asset_loader import load_image
 
 PROJECTILE_SOUND = None
+ENERGYBALL_SOUND = None
+
 class Projectile:
-    def __init__(self, x, y, direction):
-        
+    def __init__(self, x, y, direction, play_sound=True):
         global PROJECTILE_SOUND
         if PROJECTILE_SOUND is None:
             if not pygame.mixer.get_init():
                 pygame.mixer.init()
-            PROJECTILE_SOUND = pygame.mixer.Sound("assets/sounds/Attack1.ogg")
-        
-        PROJECTILE_SOUND.play().set_volume(0.2)
-        
-        self.sprite_sheet =  load_image("dipper/dipper_attack1.png",size=(80*5, 80))
+            PROJECTILE_SOUND = pygame.mixer.Sound("assets/sounds/dipper-attack1.ogg")
+
+        if play_sound:
+            PROJECTILE_SOUND.set_volume(SOUND_VOLUME)
+            PROJECTILE_SOUND.play()
+            
+        self.sprite_sheet = load_image("dipper/dipper_attack1.png", size=(80*5, 80))
         self.frames = []
         self.frame_count = 5
         self.frame_width = self.sprite_sheet.get_width() // self.frame_count
@@ -37,7 +41,6 @@ class Projectile:
         self.direction = direction
         self.lifetime = 60
 
-
     def update(self):
         self.rect.x += self.direction.x * self.speed
         self.rect.y += self.direction.y * self.speed
@@ -55,13 +58,23 @@ class Projectile:
         screen.blit(self.image, self.rect)
 
 
-
 class EnergyBall(Projectile):
     def __init__(self, x, y, direction):
-        super().__init__(x, y, direction)
-        
-        self.sprite_sheet = load_image("dipper/dipper_attack2.png",size=(50*5, 50))
-        
+        super().__init__(x, y, direction, play_sound=False)  
+
+        global ENERGYBALL_SOUND
+        if ENERGYBALL_SOUND is None:
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+            ENERGYBALL_SOUND = pygame.mixer.Sound("assets/sounds/dipper-attack2.wav")
+
+        ENERGYBALL_SOUND.set_volume(SOUND_VOLUME)
+        ENERGYBALL_SOUND.play()
+
+
+
+        self.sprite_sheet = load_image("dipper/dipper_attack2.png", size=(50*5, 50))
+
         self.frames = []
         frame_width = self.sprite_sheet.get_width() // 5
         frame_height = self.sprite_sheet.get_height()
@@ -72,8 +85,7 @@ class EnergyBall(Projectile):
 
         self.frame_index = 0
         self.frame_timer = 0
-        self.frame_interval = 5  
-
+        self.frame_interval = 5
 
         self.image = self.frames[0]
         self.rect = self.image.get_rect(center=(x, y))
@@ -81,13 +93,11 @@ class EnergyBall(Projectile):
         self.speed = 5
         self.lifetime = 90
         self.damage = 2
-        
+
     def update(self):
-        # Movimiento
         self.rect.x += self.direction.x * self.speed
         self.rect.y += self.direction.y * self.speed
 
-        # Animación
         self.frame_timer += 1
         if self.frame_timer >= self.frame_interval:
             self.frame_timer = 0
@@ -96,4 +106,3 @@ class EnergyBall(Projectile):
 
         return (self.rect.right < 0 or self.rect.left > 800 or
                 self.rect.bottom < 0 or self.rect.top > 600)
-
