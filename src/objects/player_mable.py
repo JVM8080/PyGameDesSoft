@@ -38,7 +38,7 @@ class Player:
 
         self.rect = self.image.get_rect(topleft=(x, y))
         self.vel_y = 0
-        self.speed = 5
+        self.speed = 3
         self.jump_force = -8
         self.gravity = 0.3
         self.on_ground = False
