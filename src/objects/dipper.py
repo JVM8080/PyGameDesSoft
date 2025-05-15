@@ -2,7 +2,7 @@ import pygame
 from pygame import mixer
 from config import HEIGHT, FPS, SOUND_VOLUME_SFX
 from src.utils.asset_loader import load_image
-from src.objects.projectile import Projectile, EnergyBall 
+from src.objects.projectile import Projectile, EnergyBall
 
 JUMP_SOUND = None
 TELEPORT_SOUND = None
@@ -49,7 +49,7 @@ class Player:
 
         self.invulnerable_timer = 0
         self.invulnerable_duration = 500  
-
+        
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/dipper-jump.mp3")
             
@@ -91,9 +91,29 @@ class Player:
         self.current_teleport_frame = 0
         self.teleport_anim_timer = 0
         self.teleport_anim_interval = 5 
+        
+        self.damage_sheet = load_image("dipper/dipper-death.png", size=(3 * 80, 80))  
+        self.damage_frames = []
+        for i in range(3):
+            frame = self.damage_sheet.subsurface((i * 80, 0, 80, 80))  
+            self.damage_frames.append(frame)
+
+        self.playing_damage_animation = False
+        self.damage_frame_index = 0
+        self.damage_frame_timer = 0
+        self.damage_frame_interval = 5  
 
 
     def update(self, keys=None, joystick=None):
+        if self.playing_damage_animation:
+            self.damage_frame_timer += 1
+            if self.damage_frame_timer >= self.damage_frame_interval:
+                self.damage_frame_timer = 0
+                self.damage_frame_index += 1
+                if self.damage_frame_index >= len(self.damage_frames):
+                    self.playing_damage_animation = False
+                    self.damage_frame_index = 0
+
         dx = 0
 
         if keys:
@@ -189,6 +209,12 @@ class Player:
                     self.visible = True
 
 
+    def play_damage_animation(self):
+        self.playing_damage_animation = True
+        self.damage_frame_index = 0
+        self.damage_frame_timer = 0
+
+
     def activate_invulnerability(self):
         self.invulnerable = True
         self.invulnerable_timer = pygame.time.get_ticks()
@@ -240,7 +266,7 @@ class Player:
                 start_x = self.rect.x
                 end_x = self.teleport_target_x
                 self.rect.x = start_x + (end_x - start_x) * 0.1
-
+                
 
 
     def handle_cooldowns(self):
@@ -297,10 +323,16 @@ class Player:
     def draw(self, screen):
         if self.visible:
             screen.blit(self.image, self.rect)
+        
         if self.teleporting:
             effect_image = self.teleport_frames_list[self.current_teleport_frame]
             effect_rect = effect_image.get_rect(center=self.rect.center)
             screen.blit(effect_image, effect_rect)
+
+        if self.playing_damage_animation:
+            damage_image = self.damage_frames[self.damage_frame_index]
+            damage_rect = damage_image.get_rect(center=self.rect.center)
+            screen.blit(damage_image, damage_rect)
 
         for projectile in self.projectiles:
             projectile.draw(screen)

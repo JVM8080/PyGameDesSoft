@@ -1,13 +1,13 @@
-# src/objects/enemigo.py
 import pygame
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, speed=3):
+    def __init__(self, x, y, speed=4):
         super().__init__()
         self.image = pygame.Surface((40, 40))
         self.image.fill((0, 0, 0))  # Cubo negro
         self.rect = self.image.get_rect(topleft=(x, y))
         self.speed = speed
+        self.health = 2
 
     def update(self, player_rect):
         dx = player_rect.centerx - self.rect.centerx

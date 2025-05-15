@@ -14,7 +14,7 @@ def run(screen):
 
     enemies = pygame.sprite.Group()
     enemy_spawn_timer = 0
-    enemy_spawn_delay = 1000  # cada 1 segundo
+    enemy_spawn_delay = 500  
 
     lives = 3
     font = pygame.font.SysFont(None, 36)
@@ -35,6 +35,7 @@ def run(screen):
     while running:
         dt = clock.tick(FPS)
         enemy_spawn_timer += dt
+        
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -79,6 +80,7 @@ def run(screen):
                     if not player.invulnerable:
                         lives -= 1
                         player.activate_invulnerability()
+                        player.play_damage_animation()  
                         enemies.remove(enemy)
                         if lives <= 0:
                             game_over = True
@@ -89,9 +91,12 @@ def run(screen):
             for projectile in player.projectiles.copy():
                 for enemy in enemies.copy():
                     if projectile.rect.colliderect(enemy.rect):
-                        enemies.remove(enemy)
+                        enemy.health -= getattr(projectile, 'damage', 1)  # Si el projectile no tiene damage, asume 1
                         player.projectiles.remove(projectile)
+                        if enemy.health <= 0:
+                            enemies.remove(enemy)
                         break
+
 
             for attack in player.special_attacks.copy():
                 for enemy in enemies.copy():
@@ -101,8 +106,17 @@ def run(screen):
                         break
 
             if enemy_spawn_timer >= enemy_spawn_delay:
-                enemy_x = random.randint(0, WIDTH - 40)
-                enemy_y = -40
+                spawn_side = random.choice(['top', 'left', 'right'])
+                if spawn_side == 'top':
+                    enemy_x = random.randint(0, WIDTH - 40)
+                    enemy_y = -40
+                elif spawn_side == 'left':
+                    enemy_x = -40
+                    enemy_y = random.randint(0, HEIGHT - 40)
+                else:  
+                    enemy_x = WIDTH + 40
+                    enemy_y = random.randint(0, HEIGHT - 40)
+
                 enemy = Enemy(enemy_x, enemy_y)
                 enemies.add(enemy)
                 enemy_spawn_timer = 0

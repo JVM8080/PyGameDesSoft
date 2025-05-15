@@ -2,6 +2,7 @@ import pygame
 from config import SOUND_VOLUME_SFX
 from pygame import mixer
 from src.utils.asset_loader import load_image
+from config import HEIGHT,WIDTH
 
 PROJECTILE_SOUND = None
 ENERGYBALL_SOUND = None
@@ -37,7 +38,8 @@ class Projectile:
         self.image = self.frames[0]
         self.rect = self.image.get_rect(center=(x, y))
 
-        self.speed = 7
+        self.speed = 8
+        self.damage = 2
         self.direction = direction
         self.lifetime = 60
 
@@ -89,9 +91,9 @@ class EnergyBall(Projectile):
         self.image = self.frames[0]
         self.rect = self.image.get_rect(center=(x, y))
 
-        self.speed = 5
+        self.speed = 4
         self.lifetime = 90
-        self.damage = 2
+        self.damage = 4
 
     def update(self):
         self.rect.x += self.direction.x * self.speed
