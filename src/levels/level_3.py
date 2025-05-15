@@ -76,13 +76,15 @@ def run(screen):
             for enemy in enemies.copy():
                 enemy.update(player.rect)
                 if player.rect.colliderect(enemy.rect):
-                    enemies.remove(enemy)
-                    lives -= 1
-                    if lives <= 0:
-                        game_over = True
-                        enemies.empty()
-                        player.projectiles.clear()
-                        player.special_attacks.clear()
+                    if not player.invulnerable:
+                        lives -= 1
+                        player.activate_invulnerability()
+                        enemies.remove(enemy)
+                        if lives <= 0:
+                            game_over = True
+                            enemies.empty()
+                            player.projectiles.clear()
+                            player.special_attacks.clear()
 
             for projectile in player.projectiles.copy():
                 for enemy in enemies.copy():

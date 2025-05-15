@@ -12,7 +12,7 @@ class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
         global TELEPORT_SOUND
-        self.image = load_image("dipper/dipper_parado.png", size=(40, "auto"))
+        self.image = load_image("dipper/dipper_parado.png", size=(50, "auto"))
         self.rect = self.image.get_rect(topleft=(x, y))
 
         self.vel_y = 0
@@ -44,6 +44,11 @@ class Player:
 
         self.aim_direction = pygame.math.Vector2(1, 0)  
         self.aim_locked = False  
+
+        self.invulnerable = False
+
+        self.invulnerable_timer = 0
+        self.invulnerable_duration = 500  
 
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/dipper-jump.mp3")
@@ -143,8 +148,10 @@ class Player:
         
         now = pygame.time.get_ticks()
         moving = abs(dx) > 0.1
-
-        if moving:
+        
+        if self.teleporting:
+            self.image = self.teleport_frames_list[self.current_teleport_frame]
+        elif moving:
             if now - self.last_update > self.frame_interval:
                 self.last_update = now
                 self.frame_index = (self.frame_index + 1) % len(self.walk_right_frames)
@@ -168,8 +175,24 @@ class Player:
         self.update_projectiles()
         if self.teleport_cooldown > 0:
             self.teleport_cooldown -= 1
-
         
+        if self.invulnerable:
+            if pygame.time.get_ticks() - self.invulnerable_timer >= self.invulnerable_duration:
+                self.invulnerable = False
+                self.visible = True  
+            else:
+                if not self.teleporting:
+                    if pygame.time.get_ticks() - self.blink_timer >= 100:
+                        self.visible = not self.visible
+                        self.blink_timer = pygame.time.get_ticks()
+                else:
+                    self.visible = True
+
+
+    def activate_invulnerability(self):
+        self.invulnerable = True
+        self.invulnerable_timer = pygame.time.get_ticks()
+
     def _normalize_to_8_directions(self, vector):
         x, y = vector.x, vector.y
         direction = pygame.math.Vector2(0, 0)
@@ -189,12 +212,10 @@ class Player:
         if self.teleport_cooldown > 0:
             return  
 
-        offset = 120
+        offset = 400
         self.teleport_target_x = self.rect.x + (offset if self.facing_right else -offset)
         self.teleport_frames = 0
         self.teleporting = True
-        self.blink_timer = 0
-        self.visible = False
         self.teleport_cooldown = self.teleport_cooldown_max 
 
         if not self.on_ground:
@@ -202,11 +223,11 @@ class Player:
         TELEPORT_SOUND.set_volume(SOUND_VOLUME_SFX)
         TELEPORT_SOUND.play()
 
+        self.activate_invulnerability()
 
     def handle_teleport(self):
         if self.teleporting:
             self.teleport_frames += 1
-            self.blink_timer += 1
 
             if self.teleport_frames % self.teleport_anim_interval == 0:
                 self.current_teleport_frame = (self.current_teleport_frame + 1) % len(self.teleport_frames_list)
@@ -214,12 +235,12 @@ class Player:
             if self.teleport_frames >= self.teleport_duration:
                 self.rect.x = self.teleport_target_x
                 self.teleporting = False
-                self.visible = True
-                self.current_teleport_frame = 0 
+                self.current_teleport_frame = 0
             else:
                 start_x = self.rect.x
                 end_x = self.teleport_target_x
                 self.rect.x = start_x + (end_x - start_x) * 0.1
+
 
 
     def handle_cooldowns(self):
@@ -274,7 +295,7 @@ class Player:
         self.special_attacks = []
 
     def draw(self, screen):
-        if self.visible or not self.teleporting:
+        if self.visible:
             screen.blit(self.image, self.rect)
         if self.teleporting:
             effect_image = self.teleport_frames_list[self.current_teleport_frame]
@@ -283,5 +304,5 @@ class Player:
 
         for projectile in self.projectiles:
             projectile.draw(screen)
-        for attack in self.special_attacks:
-            attack.draw(screen)
+        for special in self.special_attacks:
+            special.draw(screen)
