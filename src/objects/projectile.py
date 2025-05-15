@@ -93,7 +93,7 @@ class EnergyBall(Projectile):
 
         self.speed = 4
         self.lifetime = 90
-        self.damage = 4
+        self.damage = 6
 
     def update(self):
         self.rect.x += self.direction.x * self.speed
