@@ -6,12 +6,13 @@ from src.objects.projectile import Projectile, EnergyBall
 
 JUMP_SOUND = None
 TELEPORT_SOUND = None
-
+DAMAGE_SOUND = None
 
 class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
         global TELEPORT_SOUND
+        global DAMAGE_SOUND
         self.image = load_image("dipper/dipper_parado.png", size=(50, "auto"))
         self.rect = self.image.get_rect(topleft=(x, y))
 
@@ -55,6 +56,9 @@ class Player:
             
         if not TELEPORT_SOUND:
             TELEPORT_SOUND = mixer.Sound("assets/sounds/dipper-teleport.mp3")
+            
+        if not DAMAGE_SOUND:
+            DAMAGE_SOUND = mixer.Sound("assets/sounds/dipper-death.mp3")
 
             
         self.image_idle = load_image("dipper/dipper_parado.png", size=(40, "auto"))
@@ -213,6 +217,8 @@ class Player:
         self.playing_damage_animation = True
         self.damage_frame_index = 0
         self.damage_frame_timer = 0
+        DAMAGE_SOUND.set_volume(SOUND_VOLUME_SFX)
+        DAMAGE_SOUND.play()
 
 
     def activate_invulnerability(self):
