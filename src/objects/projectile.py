@@ -1,5 +1,5 @@
 import pygame
-from config import SOUND_VOLUME
+from config import SOUND_VOLUME_SFX
 from pygame import mixer
 from src.utils.asset_loader import load_image
 
@@ -15,7 +15,7 @@ class Projectile:
             PROJECTILE_SOUND = pygame.mixer.Sound("assets/sounds/dipper-attack1.ogg")
 
         if play_sound:
-            PROJECTILE_SOUND.set_volume(SOUND_VOLUME)
+            PROJECTILE_SOUND.set_volume(SOUND_VOLUME_SFX)
             PROJECTILE_SOUND.play()
             
         self.sprite_sheet = load_image("dipper/dipper_attack1.png", size=(80*5, 80))
@@ -67,7 +67,7 @@ class EnergyBall(Projectile):
                 pygame.mixer.init()
             ENERGYBALL_SOUND = pygame.mixer.Sound("assets/sounds/dipper-attack2.wav")
 
-        ENERGYBALL_SOUND.set_volume(SOUND_VOLUME)
+        ENERGYBALL_SOUND.set_volume(SOUND_VOLUME_SFX)
         ENERGYBALL_SOUND.play()
 
 

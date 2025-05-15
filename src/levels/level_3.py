@@ -1,10 +1,23 @@
 import pygame
+import random
 from src.objects.dipper import Player
-from config import HEIGHT, FPS
+from src.objects.enemigo import Enemy
+from src.utils.asset_loader import load_image
+from config import HEIGHT, WIDTH, FPS
+
+from src.screens.game_over_screen import GameOverScreen
+from src.screens.pause_screen import PauseScreen
 
 def run(screen):
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 150)
+
+    enemies = pygame.sprite.Group()
+    enemy_spawn_timer = 0
+    enemy_spawn_delay = 1000  # cada 1 segundo
+
+    lives = 3
+    font = pygame.font.SysFont(None, 36)
 
     joystick = None
     pygame.joystick.init()
@@ -13,17 +26,95 @@ def run(screen):
         joystick.init()
 
     running = True
+    game_over = False
+    paused = False
+
+    game_over_screen = GameOverScreen(screen)
+    pause_screen = PauseScreen(screen)
+
     while running:
+        dt = clock.tick(FPS)
+        enemy_spawn_timer += dt
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 'quit'
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return 'menu'
+
+            if game_over:
+                result = game_over_screen.handle_event(event)
+                if result == 'reset':
+                    player = Player(100, HEIGHT - 150)
+                    enemies.empty()
+                    lives = 3
+                    enemy_spawn_timer = 0
+                    game_over = False
+                elif result == 'menu':
+                    return 'menu'
+
+            elif paused:
+                result = pause_screen.handle_event(event)
+                if result == 'continue':
+                    paused = False
+                elif result == 'level_select':
+                    return 'level_select'
+                elif result == 'menu':
+                    return 'menu'
+
+            else:  
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        paused = True
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == 7:  
+                        paused = not paused
 
         keys = pygame.key.get_pressed()
-        player.update(keys=keys, joystick=joystick)
 
-        screen.fill((180, 80, 150)) 
+        if not game_over and not paused:
+            player.update(keys=keys, joystick=joystick)
+
+            for enemy in enemies.copy():
+                enemy.update(player.rect)
+                if player.rect.colliderect(enemy.rect):
+                    enemies.remove(enemy)
+                    lives -= 1
+                    if lives <= 0:
+                        game_over = True
+                        enemies.empty()
+                        player.projectiles.clear()
+                        player.special_attacks.clear()
+
+            for projectile in player.projectiles.copy():
+                for enemy in enemies.copy():
+                    if projectile.rect.colliderect(enemy.rect):
+                        enemies.remove(enemy)
+                        player.projectiles.remove(projectile)
+                        break
+
+            for attack in player.special_attacks.copy():
+                for enemy in enemies.copy():
+                    if attack.rect.colliderect(enemy.rect):
+                        enemies.remove(enemy)
+                        player.special_attacks.remove(attack)
+                        break
+
+            if enemy_spawn_timer >= enemy_spawn_delay:
+                enemy_x = random.randint(0, WIDTH - 40)
+                enemy_y = -40
+                enemy = Enemy(enemy_x, enemy_y)
+                enemies.add(enemy)
+                enemy_spawn_timer = 0
+
+        screen.blit(load_image("level_3/background_1.png", size=("auto", HEIGHT)), (0, 0))
         player.draw(screen)
+        enemies.draw(screen)
+        lives_text = font.render(f"Vidas: {lives}", True, (255, 255, 255))
+        screen.blit(lives_text, (10, 10))
+
+        if paused:
+            pause_screen.draw()
+
+        if game_over:
+            game_over_screen.draw()
+
         pygame.display.flip()
-        clock.tick(FPS)
