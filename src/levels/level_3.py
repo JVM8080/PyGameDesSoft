@@ -8,13 +8,14 @@ from config import HEIGHT, WIDTH, FPS
 from src.screens.game_over_screen import GameOverScreen
 from src.screens.pause_screen import PauseScreen
 
+from src.objects.platform import Platform
+
 def run(screen):
     clock = pygame.time.Clock()
-    player = Player(100, HEIGHT - 150)
 
     enemies = pygame.sprite.Group()
     enemy_spawn_timer = 0
-    enemy_spawn_delay = 500  
+    enemy_spawn_delay = 1000  
 
     lives = 3
     font = pygame.font.SysFont(None, 36)
@@ -31,7 +32,19 @@ def run(screen):
 
     game_over_screen = GameOverScreen(screen)
     pause_screen = PauseScreen(screen)
+    
+    platforms = pygame.sprite.Group()
+    
+    platforms.add(Platform(150, 340, phase=0))
+    platforms.add(Platform(350, 400, phase=45))
+    platforms.add(Platform(550, 340, phase=90))
+    starting_platform = list(platforms)[1]  
+    
+    player_x = starting_platform.rect.x + starting_platform.rect.width // 2
+    player_y = starting_platform.rect.y - 60  
 
+    player = Player(player_x, player_y)
+    
     while running:
         dt = clock.tick(FPS)
         enemy_spawn_timer += dt
@@ -44,7 +57,7 @@ def run(screen):
             if game_over:
                 result = game_over_screen.handle_event(event)
                 if result == 'reset':
-                    player = Player(100, HEIGHT - 150)
+                    player = Player(player_x, player_y)
                     enemies.empty()
                     lives = 3
                     enemy_spawn_timer = 0
@@ -72,7 +85,7 @@ def run(screen):
         keys = pygame.key.get_pressed()
 
         if not game_over and not paused:
-            player.update(keys=keys, joystick=joystick)
+            player.update(keys=keys, joystick=joystick, platforms=platforms)
 
             for enemy in enemies.copy():
                 enemy.update(player.rect)
@@ -124,6 +137,8 @@ def run(screen):
         screen.blit(load_image("level_3/background_1.png", size=("auto", HEIGHT)), (0, 0))
         player.draw(screen)
         enemies.draw(screen)
+        platforms.update()
+        platforms.draw(screen)
         lives_text = font.render(f"Vidas: {lives}", True, (255, 255, 255))
         screen.blit(lives_text, (10, 10))
 

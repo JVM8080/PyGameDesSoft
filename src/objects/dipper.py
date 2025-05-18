@@ -108,7 +108,7 @@ class Player:
         self.damage_frame_interval = 5  
 
 
-    def update(self, keys=None, joystick=None):
+    def update(self, keys=None, joystick=None, platforms=None):
         if self.playing_damage_animation:
             self.damage_frame_timer += 1
             if self.damage_frame_timer >= self.damage_frame_interval:
@@ -162,6 +162,20 @@ class Player:
 
         self.rect.x += dx
         self.rect.y += dy
+        
+        if platforms:
+            platform_hits = pygame.sprite.spritecollide(self, platforms, False)
+            for platform in platform_hits:
+                if self.vel_y >= 0 and self.rect.bottom <= platform.rect.bottom:
+                    self.rect.bottom = platform.rect.top
+                    self.vel_y = 0
+                    self.on_ground = True
+        else:
+            # Si no hay plataformas, usar suelo fijo (opcional)
+            if self.rect.bottom >= HEIGHT - 50:
+                self.rect.bottom = HEIGHT - 50
+                self.vel_y = 0
+                self.on_ground = True
         
         self.rect.left = max(0, self.rect.left)
         self.rect.right = min(800, self.rect.right)

@@ -2,7 +2,7 @@ import pygame
 from src.utils.asset_loader import load_image
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, speed=4):
+    def __init__(self, x, y, speed=3):
         super().__init__()
         self.image = load_image("level_3/bat.webp", size=(40, 40))
         self.rect = self.image.get_rect(topleft=(x, y))
