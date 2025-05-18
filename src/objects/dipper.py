@@ -171,7 +171,6 @@ class Player:
                     self.vel_y = 0
                     self.on_ground = True
         else:
-            # Si no hay plataformas, usar suelo fijo (opcional)
             if self.rect.bottom >= HEIGHT - 50:
                 self.rect.bottom = HEIGHT - 50
                 self.vel_y = 0
@@ -258,7 +257,7 @@ class Player:
         if self.teleport_cooldown > 0:
             return  
 
-        offset = 400
+        offset = 120
         self.teleport_target_x = self.rect.x + (offset if self.facing_right else -offset)
         self.teleport_frames = 0
         self.teleporting = True
