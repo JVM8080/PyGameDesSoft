@@ -4,7 +4,7 @@ from src.objects.dipper import Player
 from src.objects.enemigo import Enemy
 from src.objects.bill import Bill
 from src.objects.platform import Platform
-
+from src.objects.fireball import Fireball
 from src.utils.asset_loader import load_image
 from config import HEIGHT, WIDTH, FPS
 
@@ -52,10 +52,23 @@ def run(screen):
     bills = pygame.sprite.Group()
     bill = Bill(WIDTH // 2, 150, phase=0)
     bills.add(bill)
+    
+    fireballs = pygame.sprite.Group()
+    fireball_timer = 0
+    fireball_spawn_delay = 700 
+
 
     while running:
         dt = clock.tick(FPS)
         enemy_spawn_timer += dt
+        
+        if bill.is_damaged:
+            fireball_timer += dt
+            if fireball_timer >= fireball_spawn_delay:
+                fireball = Fireball()
+                fireballs.add(fireball)
+                fireball_timer = 0
+
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -110,6 +123,44 @@ def run(screen):
 
         if not game_over and not paused and not level_complete:
             player.update(keys=keys, joystick=joystick, platforms=platforms)
+            
+            fireballs.update()
+
+            for fireball in fireballs.copy():
+                if player.rect.colliderect(fireball.rect):
+                    if not player.invulnerable:
+                        lives -= 1
+                        player.activate_invulnerability()
+                        player.play_damage_animation()
+                        if lives <= 0:
+                            game_over = True
+                            enemies.empty()
+                            player.projectiles.clear()
+                            player.special_attacks.clear()
+                    fireball.kill()
+            
+            if player.rect.y >= HEIGHT-150: 
+                lives -= 1
+                if lives <= 0:
+                    game_over = True
+                    enemies.empty()
+                    player.projectiles.clear()
+                    player.special_attacks.clear()
+                else:
+                    player.rect.midbottom = starting_platform.rect.midtop
+                    player.vel_y = 0
+                    player.on_ground = True
+                    player.has_teleported_in_air = False
+                    player.teleporting = False
+                    player.visible = True
+                    player.invulnerable = False
+                    player.playing_damage_animation = False
+                    player.activate_invulnerability()
+                    player.play_damage_animation()
+                    
+                    player.rect.x = starting_platform.rect.x + starting_platform.rect.width // 2
+                    player.rect.y = starting_platform.rect.y - 90
+
 
             for enemy in enemies.copy():
                 enemy.update(player.rect)
@@ -205,6 +256,8 @@ def run(screen):
         enemies.draw(screen)
         platforms.update()
         platforms.draw(screen)
+        fireballs.draw(screen)
+        
         if not level_complete:
             bill.update(dt, player.rect)
             bills.draw(screen)
@@ -229,5 +282,8 @@ def run(screen):
             
         if level_complete:
             level_complete_screen.draw()
+            
+        lives_text = font.render(f"Vidas: {lives}", True, (255, 255, 255))
+        screen.blit(lives_text, (20, HEIGHT - 40))
 
         pygame.display.flip()

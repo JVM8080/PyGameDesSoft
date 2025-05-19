@@ -109,6 +109,7 @@ class Player:
 
 
     def update(self, keys=None, joystick=None, platforms=None):
+
         if self.playing_damage_animation:
             self.damage_frame_timer += 1
             if self.damage_frame_timer >= self.damage_frame_interval:
@@ -340,19 +341,20 @@ class Player:
         self.special_attacks = []
 
     def draw(self, screen):
-        if self.visible:
+        if self.playing_damage_animation:
+            damage_image = self.damage_frames[self.damage_frame_index]
+            damage_rect = damage_image.get_rect(center=self.rect.center)
+            screen.blit(damage_image, damage_rect)
+        elif self.visible:
             screen.blit(self.image, self.rect)
-        
+
+        # Efecto de teletransporte
         if self.teleporting:
             effect_image = self.teleport_frames_list[self.current_teleport_frame]
             effect_rect = effect_image.get_rect(center=self.rect.center)
             screen.blit(effect_image, effect_rect)
 
-        if self.playing_damage_animation:
-            damage_image = self.damage_frames[self.damage_frame_index]
-            damage_rect = damage_image.get_rect(center=self.rect.center)
-            screen.blit(damage_image, damage_rect)
-
+        # Disparos
         for projectile in self.projectiles:
             projectile.draw(screen)
         for special in self.special_attacks:

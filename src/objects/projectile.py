@@ -3,6 +3,7 @@ from config import SOUND_VOLUME_SFX
 from pygame import mixer
 from src.utils.asset_loader import load_image
 from config import HEIGHT,WIDTH
+from src.objects.fireball import Fireball
 
 PROJECTILE_SOUND = None
 ENERGYBALL_SOUND = None
