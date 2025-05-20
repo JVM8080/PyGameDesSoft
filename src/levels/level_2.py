@@ -23,6 +23,13 @@ def run(screen):
     # Carregar sprites dos inimigos
     flight_sheet = pygame.image.load(os.path.join("assets", "images", "level2", "Flight.png")).convert_alpha()
     attack_sheet = pygame.image.load(os.path.join("assets", "images", "level2", "Attack1.png")).convert_alpha()
+    spawn_points = [
+    (10, 130),           # Totem esquerdo
+    (WIDTH - 120, 130),  # Totem direito
+    (250, 80),           # nuvem esquerda
+    (500, 60),           # nuvem central
+    (700, 90),           # nuvem direita
+    ]
 
     # Criar inimigo voador
     enemies = pygame.sprite.Group()
@@ -30,6 +37,8 @@ def run(screen):
     enemies.add(enemy)
     player.enemy_group.add(enemy)  
 
+    spawn_timer = 0
+    spawn_interval = 15000  # tempo entre spawns em milissegundos
 
     running = True
     while running:
@@ -79,6 +88,24 @@ def run(screen):
 
         # redesenhar a moeda por cima
         player.poder_group.draw(screen)
+
+        now = pygame.time.get_ticks()
+        if now - spawn_timer > spawn_interval:
+            spawn_timer = now
+            from random import choice, randint, sample
+
+            qtd = randint(1, 3)  # entre 1 e 3 inimigos
+            pontos = sample(spawn_points, qtd)  # pega pontos aleatórios
+
+            for ponto in pontos:
+                x, y = ponto
+                new_enemy = FlyingEnemy(x, y, flight_sheet, attack_sheet, player)
+                enemies.add(new_enemy)
+                player.enemy_group.add(new_enemy)
+
+            # randomiza próximo intervalo (entre 2 e 5 segundos, por exemplo)
+            spawn_interval = randint(2000, 5000)
+
 
         pygame.display.flip()
         clock.tick(60)

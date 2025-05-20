@@ -34,6 +34,12 @@ class Portal(pygame.sprite.Sprite):
 class FlyingEnemy(pygame.sprite.Sprite):
     def __init__(self, x, y, flight_sheet, attack_sheet, target, scale_size=(300, 300), speed=1):
         super().__init__()
+
+        self.hit_frames = self.load_frames(pygame.image.load("assets/images/level2/Take Hit.png").convert_alpha(), 4, scale_size)
+        self.death_frames = self.load_frames(pygame.image.load("assets/images/level2/Death.png").convert_alpha(), 6, scale_size)
+        self.dead = False
+        self.hit = False
+        self.death_timer = 0
         self.flight_frames = self.load_frames(flight_sheet, 8, scale_size)
         self.attack_frames = self.load_frames(attack_sheet, 8, scale_size)
         self.image = self.flight_frames[0]
@@ -59,11 +65,35 @@ class FlyingEnemy(pygame.sprite.Sprite):
         return frames
 
     def update(self):
-        # Centro do inimigo
-        enemy_center = self.rect.center
-        # Centro do player (melhor perseguição)
-        target_center = self.target.rect.center
+        now = pygame.time.get_ticks()
 
+        if self.dead:
+            # Animação de morte
+            if now - self.last_update > self.frame_speed:
+                self.last_update = now
+                self.frame_index += 1
+                if self.frame_index >= len(self.death_frames):
+                    self.kill()
+                else:
+                    self.image = self.death_frames[self.frame_index]
+            return
+
+        if self.hit:
+            # Animação de dano
+            if now - self.last_update > self.frame_speed:
+                self.last_update = now
+                self.frame_index += 1
+                if self.frame_index >= len(self.hit_frames):
+                    self.hit = False
+                    self.state = "fly"
+                    self.frame_index = 0
+                else:
+                    self.image = self.hit_frames[self.frame_index]
+            return
+
+        # Movimento em direção ao player
+        enemy_center = self.rect.center
+        target_center = self.target.rect.center
         dx = dy = 0
         if enemy_center[0] < target_center[0]:
             dx = self.speed
@@ -78,38 +108,42 @@ class FlyingEnemy(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
-        # Checar proximidade real usando centro dos retângulos
+        # Checar proximidade para trocar estado
         distance_x = abs(self.rect.centerx - self.target.rect.centerx)
         distance_y = abs(self.rect.centery - self.target.rect.centery)
-
         if distance_x < 20 and distance_y < 20:
             self.state = "attack"
         else:
             self.state = "fly"
 
-        # Atualiza animação
-        now = pygame.time.get_ticks()
+        # Animação normal (voando ou atacando)
         if now - self.last_update > self.frame_speed:
             self.last_update = now
             self.frame_index = (self.frame_index + 1) % 8
-
             if self.state == "fly":
                 self.image = self.flight_frames[self.frame_index]
-            else:
+            elif self.state == "attack":
                 self.image = self.attack_frames[self.frame_index]
 
-        # Verifica colisão com poderes do player
+        # Verificar colisão com poderes
         for poder in self.target.poder_group:
-            if pygame.time.get_ticks() - poder.spawn_time < 50:
-                continue  # espera pelo menos 50ms pra permitir colisão
-
+            if now - poder.spawn_time < 50:
+                continue
             if self.rect.colliderect(poder.rect):
                 self.vida -= 1
+                self.hit = True
+                self.state = "hit"
+                self.frame_index = 0
+                self.last_update = now
                 poder.kill()
 
-        # Remove se morrer
-        if self.vida <= 0:
-            self.kill()
+        # Verificar morte
+        if self.vida <= 0 and not self.dead:
+            self.dead = True
+            self.state = "dead"
+            self.frame_index = 0
+            self.last_update = now
+
 
         
 
