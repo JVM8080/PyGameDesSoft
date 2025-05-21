@@ -40,10 +40,14 @@ class Player(pygame.sprite.Sprite):
         self.jump_force = -8
         self.gravity = 0.3
         self.on_ground = False
+        self.last_shoot_direction = -1  # -1 = esquerda, 1 = direita
 
         self.vida = 10
+        self.dinheiro = 0 
         self.enemy_group = pygame.sprite.Group()
 
+        self.morto_no_fogo = False
+        self.momento_morte = 0
 
         self.poder_group = pygame.sprite.Group()
         self.moeda_spritesheet = load_image("level2/stan/poder moedas.png").convert_alpha()
@@ -66,7 +70,7 @@ class Player(pygame.sprite.Sprite):
 
         dx = 0
         if keys[pygame.K_z] and not self.z_pressed_last_frame:
-            direction = 1 if keys[pygame.K_RIGHT] else -1
+            direction = self.last_shoot_direction
             offset = 30
             moeda = PoderBase(
                 self.rect.centerx + direction * offset,
@@ -91,6 +95,7 @@ class Player(pygame.sprite.Sprite):
                 if self.frame_left >= len(self.stan_anim_left):
                     self.frame_left = 0
                 self.image = self.stan_anim_left[self.frame_left]
+                self.last_shoot_direction = -1
 
         elif keys[pygame.K_RIGHT]:
             dx = self.speed
@@ -100,6 +105,8 @@ class Player(pygame.sprite.Sprite):
                 if self.frame_right >= len(self.stan_anim_right):
                     self.frame_right = 0
                 self.image = self.stan_anim_right[self.frame_right]
+                self.last_shoot_direction = 1
+
         
         else:
             self.image = self.image_idle

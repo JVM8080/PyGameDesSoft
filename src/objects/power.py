@@ -1,4 +1,5 @@
 import pygame
+from config import WIDTH
 
 class PoderBase(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, spritesheet, frame_count, frame_width, frame_height, speed=9):
@@ -31,6 +32,6 @@ class PoderBase(pygame.sprite.Sprite):
             self.image = self.frames[self.frame_index]
 
         # Remove se sair da tela
-        if self.rect.right < 0 or self.rect.left > 800:  # largura da tela
-            self.kill()   
+        if self.rect.right < 0 or self.rect.left > WIDTH:
+            self.kill()
     
