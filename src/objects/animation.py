@@ -1,6 +1,8 @@
 import pygame
 import random
 from config import *
+from src.screens.winner import tela_vitoria
+import os
 
 class Portal(pygame.sprite.Sprite):
     def __init__(self, x, y, spritesheet, frame_width=24, frame_height=32, frame_count=8, frame_speed=100, scale_size=None):
@@ -249,6 +251,7 @@ class ZombieEnemy(pygame.sprite.Sprite):
         self.health = 3
         self.hit = False
         self.dead = False
+        self.ativou_diagrama = False
 
         # Referências
         self.platforms = platforms
@@ -468,9 +471,10 @@ class MoneyBag(pygame.sprite.Sprite):
         if self.rect.colliderect(self.player.rect):
             self.player.dinheiro += 1
             if self.player.dinheiro >= 25:
-                print("Você venceu!")
-                pygame.time.delay(2000)
-                return 'menu'  # ou 'quit'
+                print("🎉 Você venceu!")
+                return 'win'
+  # chama a tela de vitória
+            
 
             print(f"Sacos coletados: {self.player.dinheiro}")
             self.reposition()
@@ -480,3 +484,33 @@ class MoneyBag(pygame.sprite.Sprite):
         x = random.randint(plataforma.rect.left, plataforma.rect.right - self.image.get_width())
         y = plataforma.rect.top - self.image.get_height()  # em cima da plataforma
         self.rect.topleft = (x, y)
+
+class DiagramaAnimado(pygame.sprite.Sprite):
+    def __init__(self, folder_path, pos, frame_speed=50, scale=1.0):
+        super().__init__()
+        self.frames = []
+        for filename in sorted(os.listdir(folder_path)):
+            if filename.endswith(".png") or filename.endswith(".jpg"):
+                image = pygame.image.load(os.path.join(folder_path, filename)).convert_alpha()
+                if scale != 1.0:
+                    image = pygame.transform.scale(
+                        image,
+                        (int(image.get_width() * scale), int(image.get_height() * scale))
+                    )
+                self.frames.append(image)
+
+        self.frame_index = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_speed = frame_speed
+        self.image = self.frames[0]
+        self.rect = self.image.get_rect(center=pos)
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_speed:
+            self.last_update = now
+            self.frame_index += 1
+            if self.frame_index >= len(self.frames):
+                self.kill()
+            else:
+                self.image = self.frames[self.frame_index]

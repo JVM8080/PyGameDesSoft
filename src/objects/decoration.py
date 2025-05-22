@@ -1,6 +1,7 @@
 import pygame
 from src.objects.animation import Portal
 from config import *
+import os
 
 def carregar_imagem_totem():
     totem_sheet = pygame.image.load("assets/images/level2/totem.png").convert_alpha()
@@ -28,7 +29,7 @@ def carregar_imagem_fogo():
         frame_speed=100,
         scale_size=(230, 230)
     )
-    fire.hitbox = pygame.Rect(WIDTH//2 - 40, HEIGHT - 120, 80, 80)
+    fire.hitbox = pygame.Rect(WIDTH//2 - 25, HEIGHT - 90, 50, 40)
     return fire
 
 vida_img = None
@@ -38,7 +39,7 @@ def desenhar_vidas(surface, vidas):
     global vida_img
     if vida_img is None:
         vida_img = pygame.image.load("assets/images/level2/vidas.png").convert_alpha()
-        vida_img = pygame.transform.scale(vida_img, (280,40))
+        vida_img = pygame.transform.scale(vida_img, (430,60))
 
     total_coracoes = 10
     coracao_largura = vida_img.get_width() // total_coracoes
@@ -47,4 +48,3 @@ def desenhar_vidas(surface, vidas):
     largura_mostrar = max(0, vidas) * coracao_largura
     rect = pygame.Rect(0, 0, largura_mostrar, coracao_altura)
     surface.blit(vida_img, POS_VIDAS, rect)
-

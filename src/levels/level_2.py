@@ -7,6 +7,7 @@ from src.utils.asset_loader import load_image
 from src.objects.animation import *
 from src.objects.decoration import *
 import random
+from src.screens.game_over import tela_game_over
 
 def run(screen):
     clock = pygame.time.Clock()
@@ -14,6 +15,9 @@ def run(screen):
 
     jogador_morreu = False
     momento_morte = 0
+
+    diagrama_animado_group = pygame.sprite.Group()
+    diagrama_disparado = False
 
     player_group = pygame.sprite.Group(player)
     totem = carregar_imagem_totem()
@@ -89,23 +93,53 @@ def run(screen):
             money_group.draw(screen)
             pygame.display.flip()
             if tempo_morrido > 3000:
-                pygame.quit()
-                exit()
+                return tela_game_over(screen)
             clock.tick(60)
             continue
 
+
         player_group.update(keys, platforms)
+        if not jogador_morreu and player.vida <= 0:
+            jogador_morreu = True
+            momento_morte = pygame.time.get_ticks()
+            print("💀 O jogador morreu, vida zerada")
+
         if not jogador_morreu and player.rect.colliderect(fire.hitbox):
             jogador_morreu = True
             momento_morte = pygame.time.get_ticks()
             print("🔥 O jogador morreu no fogo")
 
         money_group.update()
+        resultado = money_group.update()
+        if resultado == 'win':
+            return tela_vitoria(screen)
+
         player_group.draw(screen)
         money_group.draw(screen)
         desenhar_vidas(screen, player.vida)
 
+        for money in money_group:
+            resultado = money.update()
+            if resultado == 'win':
+                pygame.display.flip()  # Atualiza a tela uma última vez
+                pygame.time.delay(3000)  # Espera 3 segundos travado
+                return tela_vitoria(screen)
+            
         enemies.update()
+        for enemy in enemies:
+            if isinstance(enemy, ZombieEnemy) and fire.hitbox.colliderect(enemy.rect) and not enemy.ativou_diagrama:
+                enemy.ativou_diagrama = True
+                enemy.dead = True
+                enemy.state = "dead"
+                enemy.frame_index = 0
+                enemy.last_update = pygame.time.get_ticks()
+                enemy.frame_speed = 150  # ou outro valor adequado
+                diagrama_animado_group.add(
+                    DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.3)
+                )
+                print("⚠️ Zumbi ativou o diagrama e morreu no fogo!")
+
+
         enemies.draw(screen)
         zombie_spawns.update()
         zombie_spawns.draw(screen)
@@ -123,6 +157,9 @@ def run(screen):
             for ponto in random.sample(spawn_points, random.randint(1, 3)):
                 portal_group.add(PortalSpawn(*ponto, portal_sheet, enemies, player, flight_sheet, attack_sheet))
             spawn_interval = random.randint(10000, 15000)
+
+        diagrama_animado_group.update()
+        diagrama_animado_group.draw(screen)
 
         pygame.display.flip()
         clock.tick(60)
