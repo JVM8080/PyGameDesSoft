@@ -505,6 +505,8 @@ class DiagramaAnimado(pygame.sprite.Sprite):
         self.image = self.frames[0]
         self.rect = self.image.get_rect(center=pos)
 
+        self.terminou = False
+
     def update(self):
         now = pygame.time.get_ticks()
         if now - self.last_update > self.frame_speed:
@@ -514,3 +516,30 @@ class DiagramaAnimado(pygame.sprite.Sprite):
                 self.kill()
             else:
                 self.image = self.frames[self.frame_index]
+
+        if self.frame_index >= len(self.frames):
+            self.terminou = True
+            self.kill()
+
+class BillCipherChaser(pygame.sprite.Sprite):
+    def __init__(self, x, y, image, player, speed=2):
+        super().__init__()
+        self.image = pygame.transform.scale(image, (100, 100))  # ajuste o tamanho conforme necessário
+        self.rect = self.image.get_rect(center=(x, y))
+        self.player = player
+        self.speed = speed
+
+    def update(self):
+        # Movimento em direção ao player
+        dx = self.player.rect.centerx - self.rect.centerx
+        dy = self.player.rect.centery - self.rect.centery
+        distancia = max(1, (dx ** 2 + dy ** 2) ** 0.5)
+        self.rect.x += int(self.speed * dx / distancia)
+        self.rect.y += int(self.speed * dy / distancia)
+
+        # Colisão com player
+        if self.rect.colliderect(self.player.rect):
+            self.player.vida -= 2
+            self.player.dinheiro = max(0, self.player.dinheiro - 5)
+            print("⚠️ Bill atingiu o jogador! -2 vida, -5 dinheiro")
+            self.kill()  # remove o Bill depois de acertar

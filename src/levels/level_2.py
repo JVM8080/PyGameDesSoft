@@ -13,11 +13,20 @@ def run(screen):
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 150)
 
+    pygame.font.init()
+    fonte_sacos = pygame.font.SysFont('arial', 40, bold=True)
+    icone_dinheiro = pygame.image.load("assets/images/level2/money_bag.png").convert_alpha()
+    icone_dinheiro = pygame.transform.scale(icone_dinheiro, (90, 90))  
+
     jogador_morreu = False
     momento_morte = 0
 
+    diagramas_pendentes = []
     diagrama_animado_group = pygame.sprite.Group()
     diagrama_disparado = False
+    bill_image = pygame.image.load("assets/images/level2/angrybill.png").convert_alpha()
+    bill_group = pygame.sprite.Group()
+
 
     player_group = pygame.sprite.Group(player)
     totem = carregar_imagem_totem()
@@ -117,6 +126,9 @@ def run(screen):
         player_group.draw(screen)
         money_group.draw(screen)
         desenhar_vidas(screen, player.vida)
+        desenhar_contador_sacos(screen, fonte_sacos, player.dinheiro)
+        screen.blit(icone_dinheiro, (WIDTH - 230, 15))  # posição ajustável
+        desenhar_contador_sacos(screen, fonte_sacos, player.dinheiro)
 
         for money in money_group:
             resultado = money.update()
@@ -134,11 +146,10 @@ def run(screen):
                 enemy.frame_index = 0
                 enemy.last_update = pygame.time.get_ticks()
                 enemy.frame_speed = 150  # ou outro valor adequado
-                diagrama_animado_group.add(
-                    DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.3)
-                )
+                diagrama = DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.3)
+                diagrama_animado_group.add(diagrama)
+                diagramas_pendentes.append(diagrama)
                 print("⚠️ Zumbi ativou o diagrama e morreu no fogo!")
-
 
         enemies.draw(screen)
         zombie_spawns.update()
@@ -159,7 +170,14 @@ def run(screen):
             spawn_interval = random.randint(10000, 15000)
 
         diagrama_animado_group.update()
+        for diagrama in diagramas_pendentes[:]:  # cópia da lista para iterar com segurança
+            if diagrama.terminou:
+                bill_group.add(BillCipherChaser(WIDTH // 2, HEIGHT // 2, bill_image, player))
+                diagramas_pendentes.remove(diagrama)
+
         diagrama_animado_group.draw(screen)
+        bill_group.update()
+        bill_group.draw(screen)
 
         pygame.display.flip()
         clock.tick(60)

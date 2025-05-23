@@ -48,3 +48,8 @@ def desenhar_vidas(surface, vidas):
     largura_mostrar = max(0, vidas) * coracao_largura
     rect = pygame.Rect(0, 0, largura_mostrar, coracao_altura)
     surface.blit(vida_img, POS_VIDAS, rect)
+
+def desenhar_contador_sacos(surface, fonte, quantidade):
+    texto = fonte.render(f"[{quantidade}]", True, (255, 255, 0))
+    surface.blit(texto, (WIDTH - 150, 30))
+
