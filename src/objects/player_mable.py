@@ -10,46 +10,43 @@ class Player:
     def __init__(self, x, y):
         global JUMP_SOUND
 
-        self.image_idle = load_image("mabel/mabel.png",size=(60,"auto"))
+        self.image_idle = load_image("mabel/mabel.png", size=(60, "auto"))
         self.anim_left = load_image('mabel/mabel indo pra esquerda.png').convert_alpha()
         self.anim_right = load_image('mabel/mabel pra direita.png').convert_alpha()
 
-        # Cálculo correto para cada spritesheet
+        # Animações esquerda
         frame_width_left = self.anim_left.get_width() // 3
         frame_height_left = self.anim_left.get_height()
+        self.mabel_anim_left = [
+            self.anim_left.subsurface(pygame.Rect(i * frame_width_left, 0, frame_width_left, frame_height_left))
+            for i in range(3)
+        ]
 
+        # Animações direita
         frame_width_right = self.anim_right.get_width() // 3
         frame_height_right = self.anim_right.get_height()
-
-        self.mabel_anim_left = []
-        for i in range(3):
-            frame = self.anim_left.subsurface(pygame.Rect(i * frame_width_left, 0, frame_width_left, frame_height_left))
-            self.mabel_anim_left.append(frame)
-
-        self.mabel_anim_right = []
-        for i in range(3):
-            frame = self.anim_right.subsurface(pygame.Rect(i * frame_width_right, 0, frame_width_right, frame_height_right))
-            self.mabel_anim_right.append(frame)
+        self.mabel_anim_right = [
+            self.anim_right.subsurface(pygame.Rect(i * frame_width_right, 0, frame_width_right, frame_height_right))
+            for i in range(3)
+        ]
 
         self.frame_left = 0
         self.frame_right = 0
-
         self.image = self.mabel_anim_right[self.frame_right]
-
         self.rect = self.image.get_rect(topleft=(x, y))
+
         self.vel_y = 0
         self.speed = 3
-        self.jump_force = -8
-        self.gravity = 0.3
+        self.jump_force = -13         # mais alto
+        self.gravity = 0.45            # queda mais rápida
+        self.max_fall_speed = 10      # limite de velocidade de queda
         self.on_ground = False
 
         self.poder_group = pygame.sprite.Group()
         estrela_original = load_image("mabel/estrela_poder_transparente.png").convert_alpha()
 
-        # Reduz o tamanho da estrela em 25 vezes
         reduzida_w = estrela_original.get_width() // 25
         reduzida_h = estrela_original.get_height() // 25
-
         self.estrela_direita = pygame.transform.scale(estrela_original, (reduzida_w, reduzida_h))
         self.estrela_esquerda = pygame.transform.flip(self.estrela_direita, True, False)
 
@@ -61,15 +58,14 @@ class Player:
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 50
-
         self.z_pressed_last_frame = False
 
     def update(self, keys):
         now = pygame.time.get_ticks()
         elapsed_ticks = now - self.last_update
-
         dx = 0
 
+        # Disparo do poder
         if keys[pygame.K_z] and not self.z_pressed_last_frame:
             direction = 1 if keys[pygame.K_RIGHT] else -1 if keys[pygame.K_LEFT] else 1
             estrela_sprite = self.estrela_esquerda if direction == 1 else self.estrela_direita
@@ -86,38 +82,38 @@ class Player:
 
         self.z_pressed_last_frame = keys[pygame.K_z]
 
+        # Movimento horizontal e animação
         if keys[pygame.K_LEFT]:
             dx = -self.speed
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
                 self.frame_left = (self.frame_left + 1) % len(self.mabel_anim_left)
                 self.image = self.mabel_anim_left[self.frame_left]
-
         elif keys[pygame.K_RIGHT]:
             dx = self.speed
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
                 self.frame_right = (self.frame_right + 1) % len(self.mabel_anim_right)
                 self.image = self.mabel_anim_right[self.frame_right]
-
         else:
             self.image = self.image_idle
 
+        # Pulo
         if keys[pygame.K_SPACE] and self.on_ground:
             self.vel_y = self.jump_force
             self.on_ground = False
             JUMP_SOUND.play()
 
+        # Gravidade
         self.vel_y += self.gravity
+        if self.vel_y > self.max_fall_speed:
+            self.vel_y = self.max_fall_speed
+
         dy = self.vel_y
 
+        # Aplicar movimento
         self.rect.x += dx
         self.rect.y += dy
-
-        if self.rect.bottom >= HEIGHT - 50:
-            self.rect.bottom = HEIGHT - 50
-            self.vel_y = 0
-            self.on_ground = True
 
         self.poder_group.update()
 
