@@ -13,6 +13,11 @@ from src.screens.pause_screen import PauseScreen
 from src.screens.level_complete_screen import LevelCompleteScreen
 
 def run(screen):
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/sounds/level_3.mp3")  
+    pygame.mixer.music.set_volume(0.1)  
+    pygame.mixer.music.play(-1)
+    
     clock = pygame.time.Clock()
     dt = clock.tick(FPS)
     enemies = pygame.sprite.Group()
@@ -80,12 +85,15 @@ def run(screen):
                     player = Player(player_x, player_y)                    
                     enemies.empty()
                     bills.empty()  
+                    pygame.mixer.music.play(-1)
                     bill = Bill(WIDTH // 2, 150, phase=0)
+                    fireballs.empty()
                     bills.add(bill)
                     lives = 3
                     enemy_spawn_timer = 0
                     game_over = False
                 elif result == 'menu':
+                    pygame.mixer.music.stop()
                     return 'menu'
                     
             elif level_complete:
@@ -93,6 +101,8 @@ def run(screen):
                 if result == 'restart':
                     player = Player(player_x, player_y)
                     enemies.empty()
+                    fireballs.empty()
+                    pygame.mixer.music.play(-1)
                     bills.empty()
                     bill = Bill(WIDTH // 2, 150, phase=0)
                     bills.add(bill)
@@ -100,15 +110,20 @@ def run(screen):
                     enemy_spawn_timer = 0
                     level_complete = False
                 elif result == 'menu':
+                    pygame.mixer.music.stop()
                     return 'menu'
 
             elif paused:
                 result = pause_screen.handle_event(event)
+                pygame.mixer.music.pause()
                 if result == 'continue':
+                    pygame.mixer.music.unpause()
                     paused = False
                 elif result == 'level_select':
+                    pygame.mixer.music.stop()
                     return 'level_select'
                 elif result == 'menu':
+                    pygame.mixer.music.stop()
                     return 'menu'
 
             else:  
@@ -146,6 +161,8 @@ def run(screen):
                     enemies.empty()
                     player.projectiles.clear()
                     player.special_attacks.clear()
+                    pygame.mixer.music.stop()
+
                 else:
                     player.rect.midbottom = starting_platform.rect.midtop
                     player.vel_y = 0
@@ -194,6 +211,7 @@ def run(screen):
                     if bill.health <= 0:
                         bill.kill()
                         level_complete = True
+                        pygame.mixer.music.stop()
                         enemies.empty()
                         player.projectiles.clear()
                         player.special_attacks.clear()

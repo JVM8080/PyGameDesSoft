@@ -348,13 +348,11 @@ class Player:
         elif self.visible:
             screen.blit(self.image, self.rect)
 
-        # Efecto de teletransporte
         if self.teleporting:
             effect_image = self.teleport_frames_list[self.current_teleport_frame]
             effect_rect = effect_image.get_rect(center=self.rect.center)
             screen.blit(effect_image, effect_rect)
 
-        # Disparos
         for projectile in self.projectiles:
             projectile.draw(screen)
         for special in self.special_attacks:
