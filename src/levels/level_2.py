@@ -9,6 +9,7 @@ from src.objects.decoration import *
 import random
 from src.screens.game_over import tela_game_over
 
+
 def run(screen):
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 150)
@@ -180,4 +181,4 @@ def run(screen):
         bill_group.draw(screen)
 
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(FPS)
