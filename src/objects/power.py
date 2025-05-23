@@ -1,7 +1,8 @@
 import pygame
+from config import WIDTH
 
 class PoderBase(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction, spritesheet, frame_count, frame_width, frame_height, speed=5):
+    def __init__(self, x, y, direction, spritesheet, frame_count, frame_width, frame_height, speed=9):
         super().__init__()
         self.frames = []
         for i in range(frame_count):
@@ -11,6 +12,7 @@ class PoderBase(pygame.sprite.Sprite):
         self.frame_index = 0
         self.image = self.frames[self.frame_index]
         self.rect = self.image.get_rect(center=(x, y))
+        self.spawn_time = pygame.time.get_ticks()
 
         self.last_update = pygame.time.get_ticks()
         self.frame_delay = 80  # milissegundos entre quadros
@@ -30,6 +32,6 @@ class PoderBase(pygame.sprite.Sprite):
             self.image = self.frames[self.frame_index]
 
         # Remove se sair da tela
-        if self.rect.right < 0 or self.rect.left > 800:  # largura da tela
-            self.kill()   
+        if self.rect.right < 0 or self.rect.left > WIDTH:
+            self.kill()
     
