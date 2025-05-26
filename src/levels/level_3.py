@@ -6,11 +6,11 @@ from src.objects.bill import Bill
 from src.objects.platform import Platform
 from src.objects.fireball import Fireball
 from src.utils.asset_loader import load_image
-from config import HEIGHT, WIDTH, FPS
+from config import *
 
-from src.screens.game_over_screen import GameOverScreen
 from src.screens.pause_screen import PauseScreen
-from src.screens.level_complete_screen import LevelCompleteScreen
+from src.screens.game_over import tela_game_over
+from src.screens.winner import tela_vitoria
 
 def run(screen):
     pygame.mixer.init()
@@ -26,6 +26,7 @@ def run(screen):
 
     lives = 3
     font = pygame.font.SysFont(None, 36)
+    heart_image = load_image("level_3/vida.png", size=(32, 32))
 
     joystick = None
     pygame.joystick.init()
@@ -38,9 +39,7 @@ def run(screen):
     paused = False
     level_complete = False  
 
-    game_over_screen = GameOverScreen(screen)
     pause_screen = PauseScreen(screen)
-    level_complete_screen = LevelCompleteScreen(screen)
     
     platforms = pygame.sprite.Group()
     
@@ -50,7 +49,7 @@ def run(screen):
     starting_platform = list(platforms)[1]  
     
     player_x = starting_platform.rect.x + starting_platform.rect.width // 2
-    player_y = starting_platform.rect.y - 60  
+    player_y = starting_platform.rect.y - 90  
 
     player = Player(player_x, player_y)
     
@@ -80,45 +79,27 @@ def run(screen):
                 return 'quit'
 
             if game_over:
-                result = game_over_screen.handle_event(event)
-                if result == 'reset':
-                    player = Player(player_x, player_y)                    
-                    enemies.empty()
-                    bills.empty()  
-                    pygame.mixer.music.play(-1)
-                    bill = Bill(WIDTH // 2, 150, phase=0)
-                    fireballs.empty()
-                    bills.add(bill)
-                    lives = 3
-                    enemy_spawn_timer = 0
-                    game_over = False
-                elif result == 'menu':
+                result = tela_game_over(screen)
+                if result == 'menu':
                     pygame.mixer.music.stop()
                     return 'menu'
                     
             elif level_complete:
-                result = level_complete_screen.handle_event(event)
-                if result == 'restart':
-                    player = Player(player_x, player_y)
-                    enemies.empty()
-                    fireballs.empty()
-                    pygame.mixer.music.play(-1)
-                    bills.empty()
-                    bill = Bill(WIDTH // 2, 150, phase=0)
-                    bills.add(bill)
-                    lives = 3
-                    enemy_spawn_timer = 0
-                    level_complete = False
-                elif result == 'menu':
+                result = tela_vitoria(screen)
+                if result == 'menu':
                     pygame.mixer.music.stop()
                     return 'menu'
 
             elif paused:
+                pause_screen.update(dt)
                 result = pause_screen.handle_event(event)
                 pygame.mixer.music.pause()
                 if result == 'continue':
                     pygame.mixer.music.unpause()
+                    player.rect.x = starting_platform.rect.x + starting_platform.rect.width // 2
+                    player.rect.y = starting_platform.rect.y - 90
                     paused = False
+                    pause_screen.hide()
                 elif result == 'level_select':
                     pygame.mixer.music.stop()
                     return 'level_select'
@@ -130,9 +111,14 @@ def run(screen):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         paused = True
+                        pause_screen.show()
                 elif event.type == pygame.JOYBUTTONDOWN:
                     if event.button == 7:  
                         paused = not paused
+                        if paused:
+                            pause_screen.show()
+                        else:
+                            pause_screen.hide()
 
         keys = pygame.key.get_pressed()
 
@@ -152,6 +138,7 @@ def run(screen):
                             enemies.empty()
                             player.projectiles.clear()
                             player.special_attacks.clear()
+                            pygame.mixer.music.stop()
                     fireball.kill()
             
             if player.rect.y >= HEIGHT-150: 
@@ -281,27 +268,28 @@ def run(screen):
             bills.draw(screen)
 
             if bill.alive():
-                bar_width = 200
-                bar_height = 20
+                bar_width = 250
+                bar_height = 25
                 bar_x = (WIDTH - bar_width) // 2
                 bar_y = 20
 
+                bg_rect = pygame.Rect(bar_x, bar_y, bar_width, bar_height)
+                pygame.draw.rect(screen, (50, 50, 50), bg_rect, border_radius=10)
+
                 health_ratio = max(bill.health, 0) / bill.max_health
                 current_bar_width = int(bar_width * health_ratio)
+                health_rect = pygame.Rect(bar_x, bar_y, current_bar_width, bar_height)
+                pygame.draw.rect(screen, (200, 0, 0), health_rect, border_radius=10)
 
-                pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height)) 
-                pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, current_bar_width, bar_height))  
+                pygame.draw.rect(screen, (0, 0, 0), bg_rect, width=2, border_radius=10)
+
 
         if paused:
             pause_screen.draw()
-
-        if game_over:
-            game_over_screen.draw()
             
-        if level_complete:
-            level_complete_screen.draw()
-            
-        lives_text = font.render(f"Vidas: {lives}", True, (255, 255, 255))
-        screen.blit(lives_text, (20, HEIGHT - 40))
+        for i in range(lives):
+            x = 10 + i * (heart_image.get_width() + 10)
+            y = HEIGHT - heart_image.get_height() - 10
+            screen.blit(heart_image, (x, y))
 
         pygame.display.flip()

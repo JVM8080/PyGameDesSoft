@@ -1,76 +1,95 @@
 import pygame
 
 class PauseScreen:
-    def __init__(self, screen, width=400, height=250):
+    def __init__(self, screen, width=450, height=300):
         self.screen = screen
         self.width = width
         self.height = height
+        self.active = False
 
-        self.font = pygame.font.SysFont(None, 48)
-        self.button_font = pygame.font.SysFont(None, 36)
+        try:
+            self.font = pygame.font.Font("assets/fonts/roboto-bold.ttf", 48)
+            self.button_font = pygame.font.Font("assets/fonts/roboto-regular.ttf", 24)
+        except:
+            self.font = pygame.font.SysFont("Arial", 48, bold=True)
+            self.button_font = pygame.font.SysFont("Arial", 24)
 
-        self.rect = pygame.Rect(
-            (self.screen.get_width() - self.width) // 2,
-            (self.screen.get_height() - self.height) // 2,
-            self.width,
-            self.height
+        self.rect = self._centered_rect(self.width, self.height)
+
+        self.buttons = {
+            'continue': self._create_button("Continuar", 80),
+            'level_select': self._create_button("Selecionar Nivel", 140),
+            'menu': self._create_button("Menu", 200)
+        }
+
+        self.bg_color = (30, 30, 40, 180)  
+        self.button_color = (70, 130, 230)
+        self.hover_color = (100, 160, 255)
+        self.text_color = (255, 255, 255)
+        self.title_color = (255, 215, 0)
+
+    def _centered_rect(self, width, height):
+        screen_w, screen_h = self.screen.get_size()
+        return pygame.Rect(
+            (screen_w - width) // 2,
+            (screen_h - height) // 2,
+            width,
+            height
         )
 
-        self.btn_continue_rect = pygame.Rect(
-            self.rect.left + 100,
-            self.rect.top + 70,
-            200,
-            40
+    def _create_button(self, label, offset_y):
+        rect = pygame.Rect(
+            self.rect.left + (self.width - 220) // 2,
+            self.rect.top + offset_y,
+            220,
+            45
         )
-        self.btn_level_select_rect = pygame.Rect(
-            self.rect.left + 100,
-            self.rect.top + 120,
-            200,
-            40
-        )
-        self.btn_menu_rect = pygame.Rect(
-            self.rect.left + 100,
-            self.rect.top + 170,
-            200,
-            40
-        )
+        return {'rect': rect, 'label': label}
+
+    def show(self):
+        self.active = True
+
+    def hide(self):
+        self.active = False
+
+    def update(self, dt):
+        pass  # Sin animaciones
 
     def draw(self):
-        s = pygame.Surface((self.width, self.height))
-        s.set_alpha(230)
-        s.fill((0, 0, 0))
-        self.screen.blit(s, (self.rect.left, self.rect.top))
+        if not self.active:
+            return
 
-        text = self.font.render("PAUSA", True, (255, 255, 0))
-        text_x = self.rect.left + (self.width - text.get_width()) // 2
-        text_y = self.rect.top + 20
-        self.screen.blit(text, (text_x, text_y))
+        overlay = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        pygame.draw.rect(overlay, self.bg_color, (0, 0, self.width, self.height), border_radius=15)
+        
+        self.screen.blit(overlay, self.rect.topleft)
 
-        pygame.draw.rect(self.screen, (70, 130, 180), self.btn_continue_rect)
-        continue_text = self.button_font.render("Continuar", True, (255, 255, 255))
-        continue_x = self.btn_continue_rect.centerx - continue_text.get_width() // 2
-        continue_y = self.btn_continue_rect.centery - continue_text.get_height() // 2
-        self.screen.blit(continue_text, (continue_x, continue_y))
+        self._draw_title("PAUSA", self.rect.centerx, self.rect.top + 10)
 
-        pygame.draw.rect(self.screen, (70, 130, 180), self.btn_level_select_rect)
-        level_select_text = self.button_font.render("Selección de niveles", True, (255, 255, 255))
-        level_select_x = self.btn_level_select_rect.centerx - level_select_text.get_width() // 2
-        level_select_y = self.btn_level_select_rect.centery - level_select_text.get_height() // 2
-        self.screen.blit(level_select_text, (level_select_x, level_select_y))
+        for btn in self.buttons.values():
+            self._draw_button(btn['rect'], btn['label'])
 
-        pygame.draw.rect(self.screen, (70, 130, 180), self.btn_menu_rect)
-        menu_text = self.button_font.render("Menú", True, (255, 255, 255))
-        menu_x = self.btn_menu_rect.centerx - menu_text.get_width() // 2
-        menu_y = self.btn_menu_rect.centery - menu_text.get_height() // 2
-        self.screen.blit(menu_text, (menu_x, menu_y))
+    def _draw_title(self, text, center_x, y):
+        main_text = self.font.render(text, True, self.title_color)
+        self.screen.blit(main_text, (center_x - main_text.get_width() // 2, y))
+
+    def _draw_button(self, rect, label):
+        mouse_pos = pygame.mouse.get_pos()
+        is_hovered = rect.collidepoint(mouse_pos)
+        color = self.hover_color if is_hovered else self.button_color
+
+        pygame.draw.rect(self.screen, color, rect, border_radius=8)
+
+        text_surface = self.button_font.render(label, True, self.text_color)
+        self.screen.blit(text_surface, (
+            rect.centerx - text_surface.get_width() // 2,
+            rect.centery - text_surface.get_height() // 2
+        ))
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_pos = event.pos
-            if self.btn_continue_rect.collidepoint(mouse_pos):
-                return 'continue'
-            elif self.btn_level_select_rect.collidepoint(mouse_pos):
-                return 'level_select'
-            elif self.btn_menu_rect.collidepoint(mouse_pos):
-                return 'menu'
+            for action, btn in self.buttons.items():
+                if btn['rect'].collidepoint(mouse_pos):
+                    return action
         return None
