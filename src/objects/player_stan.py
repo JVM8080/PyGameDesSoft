@@ -79,7 +79,6 @@ class Player(pygame.sprite.Sprite):
                 dx = self.speed
                 moving_right = True
 
-        # === INPUT DE TECLADO ===
         if keys:
             if keys[pygame.K_LEFT]:
                 dx = -self.speed
@@ -135,7 +134,7 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = False
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
-                if self.vel_y > 0 and abs(self.rect.bottom - platform.rect.top) < 10:
+                if self.vel_y > 0 and abs(self.rect.bottom - platform.rect.top) < 15:
                     self.rect.bottom = platform.rect.top
                     self.vel_y = 0
                     self.on_ground = True
