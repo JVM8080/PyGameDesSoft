@@ -4,8 +4,9 @@ from config import *
 from src.screens.winner import tela_vitoria
 import os
 from pygame import mixer
-COLETAR_DINHEIRO_SOUND = None
 
+COLETAR_DINHEIRO_SOUND = None
+VITORIA_SOUND = None
 
 class Portal(pygame.sprite.Sprite):
     def __init__(self, x, y, spritesheet, frame_width=24, frame_height=32, frame_count=8, frame_speed=100, scale_size=None):
@@ -478,7 +479,6 @@ class MoneyBag(pygame.sprite.Sprite):
 
         # Colisão com o jogador
         if self.rect.colliderect(self.player.rect):
-            COLETAR_DINHEIRO_SOUND.play()
             self.player.dinheiro += 1
             if self.player.dinheiro >= 25:
                 print("🎉 Você venceu!")

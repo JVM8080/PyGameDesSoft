@@ -141,7 +141,7 @@ def run(screen):
             if resultado == 'win':
                 pygame.mixer.music.stop()
                 pygame.display.flip()  # Atualiza a tela uma última vez
-                pygame.time.delay(3000)  # Espera 3 segundos travado
+                pygame.time.delay(2000)  # Espera 3 segundos travado
                 return tela_vitoria(screen)
             
         enemies.update()

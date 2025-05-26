@@ -1,8 +1,13 @@
 import pygame
 import os
 from config import WIDTH, HEIGHT
+from pygame import mixer
 
 def tela_vitoria(screen):
+    VITORIA_SOUND = mixer.Sound("assets/sounds/resultados/victory.wav")
+    VITORIA_SOUND.set_volume(0.6)
+    VITORIA_SOUND.play(loops=-1)
+
     # Carregar os frames da animação
     frames = []
     folder = "assets/images/level2/gif.winner"
