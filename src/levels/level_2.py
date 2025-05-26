@@ -83,6 +83,7 @@ def run(screen):
                 pygame.quit()
                 exit()
             if not jogador_morreu and event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                pygame.mixer.music.stop()
                 return 'menu'
 
         keys = pygame.key.get_pressed()

@@ -5,12 +5,14 @@ from pygame import mixer
 from src.objects.power import PoderBase
 
 JUMP_SOUND = None
+TIRO_SOUND = None
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()  # chama o init da classe Sprite
 
         global JUMP_SOUND
+        global TIRO_SOUND
 
         self.image_idle = load_image("level2/stan/stan parado.png").convert_alpha()
         self.anim_left = load_image('level2/stan/stan indo pra esquerda.png').convert_alpha()
@@ -58,6 +60,10 @@ class Player(pygame.sprite.Sprite):
 
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/dipper-jump.mp3")
+        
+        if not TIRO_SOUND:
+            TIRO_SOUND = mixer.Sound("assets/sounds/level2_audio/Coin.ogg")
+            TIRO_SOUND.set_volume(0.4)
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 50
@@ -82,6 +88,7 @@ class Player(pygame.sprite.Sprite):
                 frame_height=self.moeda_frame_height
             )
             self.poder_group.add(moeda)
+            TIRO_SOUND.play()
 
         # Atualiza o estado da tecla Z para o próximo frame
         self.z_pressed_last_frame = keys[pygame.K_z]
