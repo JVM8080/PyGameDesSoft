@@ -14,7 +14,6 @@ class Player:
         self.anim_left = load_image('mabel/mabel indo pra esquerda.png').convert_alpha()
         self.anim_right = load_image('mabel/mabel pra direita.png').convert_alpha()
 
-        # Animações esquerda
         frame_width_left = self.anim_left.get_width() // 3
         frame_height_left = self.anim_left.get_height()
         self.mabel_anim_left = [
@@ -22,7 +21,6 @@ class Player:
             for i in range(3)
         ]
 
-        # Animações direita
         frame_width_right = self.anim_right.get_width() // 3
         frame_height_right = self.anim_right.get_height()
         self.mabel_anim_right = [
@@ -34,12 +32,13 @@ class Player:
         self.frame_right = 0
         self.image = self.mabel_anim_right[self.frame_right]
         self.rect = self.image.get_rect(topleft=(x, y))
-
+        
+        self.last_direction = 1
         self.vel_y = 0
-        self.speed = 3
-        self.jump_force = -13         # mais alto
-        self.gravity = 0.45            # queda mais rápida
-        self.max_fall_speed = 10      # limite de velocidade de queda
+        self.speed = 4
+        self.jump_force = -13         
+        self.gravity = 0.45            
+        self.max_fall_speed = 10      
         self.on_ground = False
 
         self.poder_group = pygame.sprite.Group()
@@ -60,15 +59,37 @@ class Player:
         self.frame_ticks = 50
         self.z_pressed_last_frame = False
 
-    def update(self, keys):
+    def update(self, keys, joystick=None):
         now = pygame.time.get_ticks()
         elapsed_ticks = now - self.last_update
         dx = 0
 
-        # Disparo do poder
-        if keys[pygame.K_z] and not self.z_pressed_last_frame:
-            direction = 1 if keys[pygame.K_RIGHT] else -1 if keys[pygame.K_LEFT] else 1
-            estrela_sprite = self.estrela_esquerda if direction == 1 else self.estrela_direita
+        jump_pressed = keys[pygame.K_SPACE]
+        fire_pressed = keys[pygame.K_z]
+        move_left = keys[pygame.K_LEFT]
+        move_right = keys[pygame.K_RIGHT]
+
+        if joystick:
+            axis_0 = joystick.get_axis(0)
+            joystick_dx = axis_0
+
+            if axis_0 < -0.3:
+                move_left = True
+            elif axis_0 > 0.3:
+                move_right = True
+
+            jump_pressed = jump_pressed or joystick.get_button(0)
+
+            fire_pressed = fire_pressed or joystick.get_button(2)
+
+
+            jump_pressed = jump_pressed or joystick.get_button(0)
+            fire_pressed = fire_pressed or joystick.get_button(2)
+
+        if fire_pressed and not self.z_pressed_last_frame:
+            direction = self.last_direction
+            estrela_sprite = self.estrela_direita if direction == 1 else self.estrela_esquerda
+
             estrela = PoderBase(
                 self.rect.centerx,
                 self.rect.centery,
@@ -80,42 +101,44 @@ class Player:
             )
             self.poder_group.add(estrela)
 
-        self.z_pressed_last_frame = keys[pygame.K_z]
+        self.z_pressed_last_frame = fire_pressed
 
-        # Movimento horizontal e animação
-        if keys[pygame.K_LEFT]:
+        if move_left:
             dx = -self.speed
+            self.last_direction = -1
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
                 self.frame_left = (self.frame_left + 1) % len(self.mabel_anim_left)
                 self.image = self.mabel_anim_left[self.frame_left]
-        elif keys[pygame.K_RIGHT]:
+
+        elif move_right:
             dx = self.speed
+            self.last_direction = 1
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
                 self.frame_right = (self.frame_right + 1) % len(self.mabel_anim_right)
                 self.image = self.mabel_anim_right[self.frame_right]
+
         else:
             self.image = self.image_idle
 
-        # Pulo
-        if keys[pygame.K_SPACE] and self.on_ground:
+        if jump_pressed and self.on_ground:
             self.vel_y = self.jump_force
             self.on_ground = False
             JUMP_SOUND.play()
 
-        # Gravidade
         self.vel_y += self.gravity
         if self.vel_y > self.max_fall_speed:
             self.vel_y = self.max_fall_speed
 
         dy = self.vel_y
 
-        # Aplicar movimento
         self.rect.x += dx
         self.rect.y += dy
 
         self.poder_group.update()
+
+
 
     def reset_position(self):
         self.rect.topleft = (100, HEIGHT - 150)

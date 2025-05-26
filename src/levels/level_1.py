@@ -19,8 +19,16 @@ def run(screen):
     player = Player(100, HEIGHT - 350)
     player.on_ground = False
     
+    joystick = None
+    pygame.joystick.init()
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+    
     lives = 8
     heart_image = load_image("level_3/vida.png", size=(32, 32))
+    porco_icon = load_image("porco1.png", size=("auto", 35))
+
 
     background = load_image("mabel/imagem level 1.jpg").convert()
     background = pygame.transform.scale(background, screen.get_size())
@@ -28,13 +36,11 @@ def run(screen):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
 
-    # Arco-íris visível
     rainbow_image = load_image("rainbow_large_from_original.png")
     rainbow_image = pygame.transform.scale(rainbow_image, (300, 200))
     rainbow_rect = rainbow_image.get_rect(midtop=(screen_width // 2, 0))
     arco_rect = rainbow_rect
 
-    # Plataformas
     platforms = pygame.sprite.Group()
 
     platform_surface = load_image("mabel/plataforma3_limpa.png")
@@ -55,18 +61,15 @@ def run(screen):
             break
 
 
-    # Gnomos
     gnomo_group = pygame.sprite.Group()
     last_gnomo_spawn = pygame.time.get_ticks()
-    intervalo_gnomo = 2000
+    intervalo_gnomo = 1400
 
-    # Porquinhos
     porcos_group = pygame.sprite.Group()
     coletados = 0
     last_spawn_time = pygame.time.get_ticks()
     intervalo_spawn = 4000
 
-    # Pantalla de pausa
     pause_screen = PauseScreen(screen)
 
 
@@ -88,6 +91,8 @@ def run(screen):
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     pause_screen.show()
+                elif event.type == pygame.JOYBUTTONDOWN and event.button == 7:
+                    pause_screen.show()
 
         if pause_screen.active:
             pause_screen.update(dt)
@@ -101,7 +106,7 @@ def run(screen):
             continue
 
         keys = pygame.key.get_pressed()
-        player.update(keys)
+        player.update(keys, joystick)
 
         now = pygame.time.get_ticks()
 
@@ -122,13 +127,11 @@ def run(screen):
                 porcos_group.add(porco)
             last_spawn_time = now
 
-        # Gnomo do arco-íris
         if now - last_gnomo_spawn > intervalo_gnomo:
             novo_gnomo = GnomoInimigo(arco_rect, player, platforms)
             gnomo_group.add(novo_gnomo)
             last_gnomo_spawn = now
 
-        # Coleta porcos
         colididos = pygame.sprite.spritecollide(player, porcos_group, True)
         coletados += len(colididos)
         if coletados >= 20:
@@ -149,7 +152,6 @@ def run(screen):
                     elif result == 'level_select':
                         return 'level_select' 
 
-        # Limites da Mabel
         if player.rect.left < 0:
             player.rect.left = 0
         if player.rect.right > screen_width:
@@ -196,11 +198,11 @@ def run(screen):
         gnomo_group.draw(screen)
         porcos_group.draw(screen)
 
-        # Mostrar vidas
         for i in range(lives):
             screen.blit(heart_image, (WIDTH - (i + 1) * 40, 20))
 
-        texto_porcos = font_porcos.render(f"Porcos: {coletados}/20", True, (255, 255, 255))
-        screen.blit(texto_porcos, (20, 20))
+        screen.blit(porco_icon, (20, 20))
+        texto_porcos = font_porcos.render(f"[{coletados}]", True, (255, 255, 0))
+        screen.blit(texto_porcos, (80, 30))
 
         pygame.display.flip()
