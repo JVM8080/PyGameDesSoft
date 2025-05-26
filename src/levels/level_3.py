@@ -91,6 +91,7 @@ def run(screen):
                     return 'menu'
 
             elif paused:
+                pause_screen.update(dt)
                 result = pause_screen.handle_event(event)
                 pygame.mixer.music.pause()
                 if result == 'continue':
@@ -98,6 +99,7 @@ def run(screen):
                     player.rect.x = starting_platform.rect.x + starting_platform.rect.width // 2
                     player.rect.y = starting_platform.rect.y - 90
                     paused = False
+                    pause_screen.hide()
                 elif result == 'level_select':
                     pygame.mixer.music.stop()
                     return 'level_select'
@@ -109,9 +111,14 @@ def run(screen):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         paused = True
+                        pause_screen.show()
                 elif event.type == pygame.JOYBUTTONDOWN:
                     if event.button == 7:  
                         paused = not paused
+                        if paused:
+                            pause_screen.show()
+                        else:
+                            pause_screen.hide()
 
         keys = pygame.key.get_pressed()
 
