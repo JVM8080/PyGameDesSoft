@@ -57,7 +57,7 @@ class Player(pygame.sprite.Sprite):
         self.moeda_frame_height = self.moeda_spritesheet.get_height()
 
         if not JUMP_SOUND:
-            JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
+            JUMP_SOUND = mixer.Sound("assets/sounds/dipper-jump.mp3")
 
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 50
