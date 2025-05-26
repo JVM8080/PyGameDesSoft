@@ -8,6 +8,8 @@ from src.objects.animation import *
 from src.objects.decoration import *
 import random
 from src.screens.game_over import tela_game_over
+from src.screens.pause_screen import PauseScreen
+
 
 
 def run(screen):
@@ -19,6 +21,15 @@ def run(screen):
     icone_dinheiro = pygame.image.load("assets/images/level2/money_bag.png").convert_alpha()
     icone_dinheiro = pygame.transform.scale(icone_dinheiro, (90, 90))  
 
+    joystick = None
+    pygame.joystick.init()
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+    
+    pause_screen = PauseScreen(screen)
+    is_paused = False
+    
     jogador_morreu = False
     momento_morte = 0
 
@@ -75,10 +86,37 @@ def run(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if not jogador_morreu and event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return 'menu'
 
-        keys = pygame.key.get_pressed()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                is_paused = not is_paused
+                if is_paused:
+                    pause_screen.show()
+                else:
+                    pause_screen.hide()
+
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 7:  
+                is_paused = not is_paused
+                if is_paused:
+                    pause_screen.show()
+                else:
+                    pause_screen.hide()
+
+            if is_paused:
+                action = pause_screen.handle_event(event)
+                if action == 'continue':
+                    is_paused = False
+                    pause_screen.hide()
+                elif action == 'menu':
+                    return 'menu'
+                elif action == 'level_select':
+                    return 'level_select'
+
+        if is_paused:
+            pause_screen.draw()
+            pygame.display.flip()
+            clock.tick(60)
+            continue
+
 
         background = pygame.image.load("assets/images/level2/cenario level 2.jpeg").convert()
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
@@ -106,9 +144,10 @@ def run(screen):
                 return tela_game_over(screen)
             clock.tick(60)
             continue
-
-
-        player_group.update(keys, platforms)
+        
+        keys = pygame.key.get_pressed()
+        player_group.update(keys, platforms, joystick)
+        
         if not jogador_morreu and player.vida <= 0:
             jogador_morreu = True
             momento_morte = pygame.time.get_ticks()
@@ -128,16 +167,16 @@ def run(screen):
         money_group.draw(screen)
         desenhar_vidas(screen, player.vida)
         desenhar_contador_sacos(screen, fonte_sacos, player.dinheiro)
-        screen.blit(icone_dinheiro, (WIDTH - 230, 15))  # posição ajustável
+        screen.blit(icone_dinheiro, (WIDTH - 230, 15))
         desenhar_contador_sacos(screen, fonte_sacos, player.dinheiro)
 
         for money in money_group:
             resultado = money.update()
             if resultado == 'win':
-                pygame.display.flip()  # Atualiza a tela uma última vez
-                pygame.time.delay(3000)  # Espera 3 segundos travado
+                pygame.display.flip()
+                pygame.time.delay(3000)
                 return tela_vitoria(screen)
-            
+
         enemies.update()
         for enemy in enemies:
             if isinstance(enemy, ZombieEnemy) and fire.hitbox.colliderect(enemy.rect) and not enemy.ativou_diagrama:
@@ -146,7 +185,7 @@ def run(screen):
                 enemy.state = "dead"
                 enemy.frame_index = 0
                 enemy.last_update = pygame.time.get_ticks()
-                enemy.frame_speed = 150  # ou outro valor adequado
+                enemy.frame_speed = 150
                 diagrama = DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.3)
                 diagrama_animado_group.add(diagrama)
                 diagramas_pendentes.append(diagrama)
@@ -171,7 +210,7 @@ def run(screen):
             spawn_interval = random.randint(10000, 15000)
 
         diagrama_animado_group.update()
-        for diagrama in diagramas_pendentes[:]:  # cópia da lista para iterar com segurança
+        for diagrama in diagramas_pendentes[:]:
             if diagrama.terminou:
                 bill_group.add(BillCipherChaser(WIDTH // 2, HEIGHT // 2, bill_image, player))
                 diagramas_pendentes.remove(diagrama)
@@ -182,3 +221,4 @@ def run(screen):
 
         pygame.display.flip()
         clock.tick(FPS)
+

@@ -1,10 +1,13 @@
 import pygame
+from config import HEIGHT, WIDTH, FPS
 from src.objects.player_mable import Player
-from config import HEIGHT, FPS
 from src.utils.asset_loader import load_image
 from src.objects.platforma_level1 import Platform
 from src.objects.gnomo_inimigo import GnomoInimigo
 from src.objects.porquinho import Porquinho
+
+from src.screens.pause_screen import PauseScreen
+
 
 def run(screen):
     clock = pygame.time.Clock()
@@ -28,12 +31,15 @@ def run(screen):
 
     # Plataformas
     platforms = pygame.sprite.Group()
-    platform3_surface = load_image("mabel/plataforma3_limpa.png")
-    large_width, large_height = 180, 60
 
-    platform2 = Platform(pygame.transform.scale(platform3_surface, (large_width, large_height)), screen_width - large_width - 60, HEIGHT - 180)
-    platform3 = Platform(pygame.transform.scale(platform3_surface, (large_width, large_height)), screen_width // 2 - large_width // 2, HEIGHT - 260)
-    platform4 = Platform(pygame.transform.scale(platform3_surface, (large_width, large_height)), 60, HEIGHT - 180)
+    platform_surface = load_image("mabel/plataforma3_limpa.png")
+    small_w, small_h = 50, 30
+    large_w, large_h = 180, 60
+
+    platform2 = Platform(pygame.transform.scale(platform_surface, (large_w, large_h)), screen_width - large_w - 60, HEIGHT - 180)
+    platform3 = Platform(pygame.transform.scale(platform_surface, (large_w, large_h)), screen_width // 2 - large_w // 2, HEIGHT - 260)
+    platform4 = Platform(pygame.transform.scale(platform_surface, (large_w, large_h)), 60, HEIGHT - 180)
+
     platforms.add(platform2, platform3, platform4)
 
     for plat in platforms:
@@ -42,6 +48,7 @@ def run(screen):
             player.vel_y = 0
             player.on_ground = True
             break
+
 
     # Gnomos
     gnomo_group = pygame.sprite.Group()
@@ -54,13 +61,39 @@ def run(screen):
     last_spawn_time = pygame.time.get_ticks()
     intervalo_spawn = 4000
 
+    # Pantalla de pausa
+    pause_screen = PauseScreen(screen)
+
+
     running = True
     while running:
+        dt = clock.tick(FPS) / 1000
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 'quit'
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return 'menu'
+            if pause_screen.active:
+                action = pause_screen.handle_event(event)
+                if action == 'continue':
+                    pause_screen.hide()
+                elif action == 'menu':
+                    return 'menu'
+                elif action == 'level_select':
+                    return 'level_select'
+            else:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    pause_screen.show()
+
+        if pause_screen.active:
+            pause_screen.update(dt)
+            screen.blit(background, (0, 0))
+            platforms.update()
+            for p in platforms:
+                p.draw(screen)
+            player.draw(screen)
+            pause_screen.draw()
+            pygame.display.flip()
+            continue
 
         keys = pygame.key.get_pressed()
         player.update(keys)
@@ -112,6 +145,7 @@ def run(screen):
         if player.rect.bottom == screen_height and not any(player.rect.colliderect(p.rect) for p in platforms):
             player.on_ground = True
 
+
         collided = False
         for plat in platforms:
             if player.vel_y > 0:
@@ -130,17 +164,18 @@ def run(screen):
 
         if not collided and player.rect.bottom < screen_height:
             player.on_ground = False
-
         # Atualizações
         gnomo_group.update()
         porcos_group.update()
 
-        # Desenho
+
+
+
+        # Render
         screen.blit(background, (0, 0))
         screen.blit(rainbow_image, rainbow_rect)
         for p in platforms:
             p.draw(screen)
-
         player.draw(screen)
         gnomo_group.draw(screen)
         porcos_group.draw(screen)
@@ -149,4 +184,3 @@ def run(screen):
         screen.blit(texto_porcos, (20, 20))
 
         pygame.display.flip()
-        clock.tick(FPS)
