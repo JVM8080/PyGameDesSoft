@@ -139,7 +139,7 @@ class Player(pygame.sprite.Sprite):
                     self.vel_y = 0
                     self.on_ground = True
 
-        if jump_button and self.on_ground and not self.jump_pressed_last_frame:
+        if jump_button and self.on_ground:
             self.vel_y = self.jump_force
             self.on_ground = False
             JUMP_SOUND.play()
