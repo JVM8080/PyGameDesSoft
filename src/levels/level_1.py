@@ -12,6 +12,10 @@ from src.screens.winner import tela_vitoria
 
 
 def run(screen):
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/sounds/som-level1.mp3")
+    pygame.mixer.music.play(-1)  # -1 = loop infinito
+
     clock = pygame.time.Clock()
     pygame.font.init()
     font_porcos = pygame.font.SysFont("arial", 24)
@@ -28,7 +32,6 @@ def run(screen):
     lives = 8
     heart_image = load_image("level_3/vida.png", size=(32, 32))
     porco_icon = load_image("porco1.png", size=("auto", 35))
-
 
     background = load_image("mabel/imagem level 1.jpg").convert()
     background = pygame.transform.scale(background, screen.get_size())
@@ -60,7 +63,6 @@ def run(screen):
             player.on_ground = True
             break
 
-
     gnomo_group = pygame.sprite.Group()
     last_gnomo_spawn = pygame.time.get_ticks()
     intervalo_gnomo = 1400
@@ -72,21 +74,23 @@ def run(screen):
 
     pause_screen = PauseScreen(screen)
 
-
     running = True
     while running:
         dt = clock.tick(FPS) / 1000
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.mixer.music.stop()
                 return 'quit'
             if pause_screen.active:
                 action = pause_screen.handle_event(event)
                 if action == 'continue':
                     pause_screen.hide()
                 elif action == 'menu':
+                    pygame.mixer.music.stop()
                     return 'menu'
                 elif action == 'level_select':
+                    pygame.mixer.music.stop()
                     return 'level_select'
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -135,17 +139,17 @@ def run(screen):
         colididos = pygame.sprite.spritecollide(player, porcos_group, True)
         coletados += len(colididos)
         if coletados >= 20:
-            tela_vitoria(screen)
+            pygame.mixer.music.stop()
             result = tela_vitoria(screen)
             if result == 'menu':
-                pygame.mixer.music.stop()
                 return 'menu'
-        
+
         for gnomo in gnomo_group.copy():
             if player.rect.colliderect(gnomo.rect):
                 gnomo_group.remove(gnomo)
                 lives -= 1
                 if lives <= 0:
+                    pygame.mixer.music.stop()
                     result = tela_game_over(screen)
                     if result == 'menu':
                         return 'menu'
@@ -165,7 +169,6 @@ def run(screen):
 
         if player.rect.bottom == screen_height and not any(player.rect.colliderect(p.rect) for p in platforms):
             player.on_ground = True
-
 
         collided = False
         for plat in platforms:
