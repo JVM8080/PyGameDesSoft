@@ -284,16 +284,21 @@ def run(screen):
             bills.draw(screen)
 
             if bill.alive():
-                bar_width = 200
-                bar_height = 20
+                bar_width = 250
+                bar_height = 25
                 bar_x = (WIDTH - bar_width) // 2
                 bar_y = 20
 
+                bg_rect = pygame.Rect(bar_x, bar_y, bar_width, bar_height)
+                pygame.draw.rect(screen, (50, 50, 50), bg_rect, border_radius=10)
+
                 health_ratio = max(bill.health, 0) / bill.max_health
                 current_bar_width = int(bar_width * health_ratio)
+                health_rect = pygame.Rect(bar_x, bar_y, current_bar_width, bar_height)
+                pygame.draw.rect(screen, (200, 0, 0), health_rect, border_radius=10)
 
-                pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height)) 
-                pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, current_bar_width, bar_height))  
+                pygame.draw.rect(screen, (0, 0, 0), bg_rect, width=2, border_radius=10)
+
 
         if paused:
             pause_screen.draw()
