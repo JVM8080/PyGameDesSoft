@@ -3,9 +3,12 @@ import pygame
 def level_select(screen):
     font = pygame.font.SysFont(None, 50)
     level_buttons = [pygame.Rect(150 + i * 170, 250, 150, 60) for i in range(3)]
+    
+    background = pygame.image.load("assets/images/Select level.png").convert()
+    background = pygame.transform.scale(background, screen.get_size())
 
     while True:
-        screen.fill((50, 50, 50))
+        screen.blit(background, (0, 0))
 
         for i, rect in enumerate(level_buttons):
             pygame.draw.rect(screen, (100, 180, 100), rect)
