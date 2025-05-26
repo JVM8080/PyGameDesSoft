@@ -2,15 +2,29 @@ import pygame
 
 def level_select(screen):
     font = pygame.font.SysFont(None, 50)
-    level_buttons = [pygame.Rect(150 + i * 170, 250, 150, 60) for i in range(3)]
+
+    background = pygame.image.load("assets/images/menu/level select.png").convert()
+    background = pygame.transform.scale(background, screen.get_size())
+
+    button_images = [
+        pygame.image.load("assets/images/menu/level 1.png").convert_alpha(),
+        pygame.image.load("assets/images/menu/level 2.png").convert_alpha(),
+        pygame.image.load("assets/images/menu/level 3.png").convert_alpha()
+    ]
+    button_images = [pygame.transform.scale(img, (180, 60)) for img in button_images]
+
+    positions = [(80, 430), (300, 400), (520, 370)]  # x, y de cada botão
+
+    level_buttons = []
+    for i, img in enumerate(button_images):
+        rect = img.get_rect(topleft=positions[i])
+        level_buttons.append(rect)
 
     while True:
-        screen.fill((50, 50, 50))
+        screen.blit(background, (0, 0))
 
         for i, rect in enumerate(level_buttons):
-            pygame.draw.rect(screen, (100, 180, 100), rect)
-            text = font.render(f"Nivel {i+1}", True, (0, 0, 0))
-            screen.blit(text, (rect.x + 25, rect.y + 10))
+            screen.blit(button_images[i], rect.topleft)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
