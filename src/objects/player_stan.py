@@ -1,5 +1,5 @@
 import pygame
-from config import HEIGHT
+from config import *
 from src.utils.asset_loader import load_image
 from pygame import mixer
 from src.objects.power import PoderBase
@@ -130,6 +130,18 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.x += dx
         self.rect.y += dy
+        
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > HEIGHT:
+            self.rect.bottom = HEIGHT
+            self.vel_y = 0  
+            self.on_ground = True
+
 
         self.on_ground = False
         for platform in platforms:
