@@ -118,8 +118,6 @@ def run(screen):
             continue
 
 
-        keys = pygame.key.get_pressed()
-
         background = pygame.image.load("assets/images/level2/cenario level 2.jpeg").convert()
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
@@ -146,8 +144,10 @@ def run(screen):
                 return tela_game_over(screen)
             clock.tick(60)
             continue
-
+        
+        keys = pygame.key.get_pressed()
         player_group.update(keys, platforms, joystick)
+        
         if not jogador_morreu and player.vida <= 0:
             jogador_morreu = True
             momento_morte = pygame.time.get_ticks()
