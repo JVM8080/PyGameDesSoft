@@ -6,7 +6,7 @@ from src.objects.bill import Bill
 from src.objects.platform import Platform
 from src.objects.fireball import Fireball
 from src.utils.asset_loader import load_image
-from config import HEIGHT, WIDTH, FPS
+from config import *
 
 from src.screens.game_over_screen import GameOverScreen
 from src.screens.pause_screen import PauseScreen
@@ -50,7 +50,7 @@ def run(screen):
     starting_platform = list(platforms)[1]  
     
     player_x = starting_platform.rect.x + starting_platform.rect.width // 2
-    player_y = starting_platform.rect.y - 60  
+    player_y = starting_platform.rect.y - 90  
 
     player = Player(player_x, player_y)
     
@@ -118,6 +118,8 @@ def run(screen):
                 pygame.mixer.music.pause()
                 if result == 'continue':
                     pygame.mixer.music.unpause()
+                    player.rect.x = starting_platform.rect.x + starting_platform.rect.width // 2
+                    player.rect.y = starting_platform.rect.y - 90
                     paused = False
                 elif result == 'level_select':
                     pygame.mixer.music.stop()
