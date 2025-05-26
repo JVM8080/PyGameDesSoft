@@ -25,7 +25,6 @@ def run(screen):
     enemy_spawn_delay = 1000  
 
     lives = 3
-    font = pygame.font.SysFont(None, 36)
     heart_image = load_image("level_3/vida.png", size=(32, 32))
 
     joystick = None
