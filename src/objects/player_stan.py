@@ -16,7 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.anim_left = load_image('level2/stan/stan indo pra esquerda.png').convert_alpha()
         self.anim_right = load_image('level2/stan/stan indo pra direita.png').convert_alpha()
 
-        frame_width = self.anim_left.get_width()//3
+        frame_width = self.anim_left.get_width() // 3
         frame_height = self.anim_left.get_height()
 
         self.stan_anim_left = [self.anim_left.subsurface(i * frame_width, 0, frame_width, frame_height) for i in range(3)]
@@ -27,6 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.stan_anim_right[self.frame_right]
         self.rect = self.image.get_rect(topleft=(x, y))
 
+        # Física e controle
         self.vel_y = 0
         self.speed = 5
         self.jump_force = -8
@@ -34,12 +35,14 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = False
         self.last_shoot_direction = -1
 
+        # Estado
         self.vida = 10
         self.dinheiro = 0 
         self.enemy_group = pygame.sprite.Group()
         self.morto_no_fogo = False
         self.momento_morte = 0
 
+        # Poder
         self.poder_group = pygame.sprite.Group()
         self.moeda_spritesheet = load_image("level2/stan/poder moedas.png").convert_alpha()
         self.moeda_frame_width = self.moeda_spritesheet.get_width() // 6
@@ -48,47 +51,65 @@ class Player(pygame.sprite.Sprite):
         if not JUMP_SOUND:
             JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
 
+        # Animação e flags
         self.last_update = pygame.time.get_ticks()
         self.frame_ticks = 50
         self.shoot_pressed_last_frame = False
         self.jump_pressed_last_frame = False
 
-    def update(self, keys, platforms,joystick=None):
+    def update(self, keys, platforms, joystick=None):
         now = pygame.time.get_ticks()
         elapsed_ticks = now - self.last_update
 
         dx = 0
-
-        joystick_axis_x = 0
         shoot_button = False
         jump_button = False
+        moving_left = False
+        moving_right = False
 
         if joystick:
-            joystick_axis_x = joystick.get_axis(0)  
+            axis_x = joystick.get_axis(0)
             shoot_button = joystick.get_button(2)  
-            jump_button = joystick.get_button(0)   
+            jump_button = joystick.get_button(0)  
 
-        # Movimento esquerdo/direito
-        if joystick_axis_x < -0.3:  # esquerda
-            dx = -self.speed
+            if axis_x < -0.3:
+                dx = -self.speed
+                moving_left = True
+            elif axis_x > 0.3:
+                dx = self.speed
+                moving_right = True
+
+        # === INPUT DE TECLADO ===
+        if keys:
+            if keys[pygame.K_LEFT]:
+                dx = -self.speed
+                moving_left = True
+            elif keys[pygame.K_RIGHT]:
+                dx = self.speed
+                moving_right = True
+
+            if keys[pygame.K_z]:
+                shoot_button = True
+            if keys[pygame.K_SPACE]:
+                jump_button = True
+
+        if moving_left:
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
                 self.frame_left = (self.frame_left + 1) % len(self.stan_anim_left)
-                self.image = self.stan_anim_left[self.frame_left]
+            self.image = self.stan_anim_left[self.frame_left]
             self.last_shoot_direction = -1
 
-        elif joystick_axis_x > 0.3:  # direita
-            dx = self.speed
+        elif moving_right:
             if elapsed_ticks > self.frame_ticks:
                 self.last_update = now
                 self.frame_right = (self.frame_right + 1) % len(self.stan_anim_right)
-                self.image = self.stan_anim_right[self.frame_right]
+            self.image = self.stan_anim_right[self.frame_right]
             self.last_shoot_direction = 1
 
         else:
             self.image = self.image_idle
 
-        # Atirar com botão X
         if shoot_button and not self.shoot_pressed_last_frame:
             direction = self.last_shoot_direction
             offset = 30
@@ -105,13 +126,6 @@ class Player(pygame.sprite.Sprite):
 
         self.shoot_pressed_last_frame = shoot_button
 
-        if jump_button and self.on_ground and not self.jump_pressed_last_frame:
-            self.vel_y = self.jump_force
-            self.on_ground = False
-            JUMP_SOUND.play()
-
-        self.jump_pressed_last_frame = jump_button
-
         self.vel_y += self.gravity
         dy = self.vel_y
 
@@ -121,10 +135,17 @@ class Player(pygame.sprite.Sprite):
         self.on_ground = False
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
-                if self.vel_y > 0 and self.rect.bottom <= platform.rect.bottom:
+                if self.vel_y > 0 and abs(self.rect.bottom - platform.rect.top) < 10:
                     self.rect.bottom = platform.rect.top
                     self.vel_y = 0
                     self.on_ground = True
+
+        if jump_button and self.on_ground and not self.jump_pressed_last_frame:
+            self.vel_y = self.jump_force
+            self.on_ground = False
+            JUMP_SOUND.play()
+
+        self.jump_pressed_last_frame = jump_button
 
         self.poder_group.update()
 
@@ -137,13 +158,10 @@ class Player(pygame.sprite.Sprite):
                 if self.vida <= 0:
                     self.kill()
 
+
     def reset_position(self):
         self.rect.topleft = (100, HEIGHT - 150)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         self.poder_group.draw(screen)
-
-
-
-        
