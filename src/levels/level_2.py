@@ -11,6 +11,13 @@ from src.screens.game_over import tela_game_over
 
 
 def run(screen):
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/sounds/level2_audio/level2.ogg")
+    pygame.mixer.music.set_volume(1)  # volume de 0.0 a 1.0
+    pygame.mixer.music.play(-1)  # -1 faz repetir infinitamente
+    som_morte = pygame.mixer.Sound("assets/sounds/level2_audio/stan_death.wav")
+    som_morte.set_volume(0.5)  # volume de 0.0 a 1.0
+
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 150)
 
@@ -97,6 +104,8 @@ def run(screen):
         screen.blit(totem.image, (WIDTH - 120, 130))
 
         if jogador_morreu:
+            pygame.mixer.music.stop()
+            som_morte.play()
             tempo_morrido = pygame.time.get_ticks() - momento_morte
             desenhar_vidas(screen, player.vida)
             player_group.draw(screen)
@@ -119,11 +128,6 @@ def run(screen):
             momento_morte = pygame.time.get_ticks()
             print("🔥 O jogador morreu no fogo")
 
-        money_group.update()
-        resultado = money_group.update()
-        if resultado == 'win':
-            return tela_vitoria(screen)
-
         player_group.draw(screen)
         money_group.draw(screen)
         desenhar_vidas(screen, player.vida)
@@ -134,6 +138,7 @@ def run(screen):
         for money in money_group:
             resultado = money.update()
             if resultado == 'win':
+                pygame.mixer.music.stop()
                 pygame.display.flip()  # Atualiza a tela uma última vez
                 pygame.time.delay(3000)  # Espera 3 segundos travado
                 return tela_vitoria(screen)
