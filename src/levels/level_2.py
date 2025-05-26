@@ -19,6 +19,12 @@ def run(screen):
     icone_dinheiro = pygame.image.load("assets/images/level2/money_bag.png").convert_alpha()
     icone_dinheiro = pygame.transform.scale(icone_dinheiro, (90, 90))  
 
+    joystick = None
+    pygame.joystick.init()
+    if pygame.joystick.get_count() > 0:
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+    
     jogador_morreu = False
     momento_morte = 0
 
@@ -108,7 +114,7 @@ def run(screen):
             continue
 
 
-        player_group.update(keys, platforms)
+        player_group.update(keys, platforms, joystick)
         if not jogador_morreu and player.vida <= 0:
             jogador_morreu = True
             momento_morte = pygame.time.get_ticks()
