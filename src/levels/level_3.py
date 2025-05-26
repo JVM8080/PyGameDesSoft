@@ -26,6 +26,7 @@ def run(screen):
 
     lives = 3
     font = pygame.font.SysFont(None, 36)
+    heart_image = load_image("level_3/vida.png", size=(32, 32))
 
     joystick = None
     pygame.joystick.init()
@@ -303,7 +304,9 @@ def run(screen):
         if level_complete:
             level_complete_screen.draw()
             
-        lives_text = font.render(f"Vidas: {lives}", True, (255, 255, 255))
-        screen.blit(lives_text, (20, HEIGHT - 40))
+        for i in range(lives):
+            x = 10 + i * (heart_image.get_width() + 10)
+            y = HEIGHT - heart_image.get_height() - 10
+            screen.blit(heart_image, (x, y))
 
         pygame.display.flip()
