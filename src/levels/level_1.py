@@ -1,15 +1,16 @@
 import pygame
+from config import HEIGHT, WIDTH, FPS
 from src.objects.player_mable import Player
-from config import HEIGHT, FPS
 from src.utils.asset_loader import load_image
 from src.objects.platforma_level1 import Platform
+from src.screens.pause_screen import PauseScreen
+
 
 def run(screen):
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 350)
-    player.on_ground = False  # assume que começa no ar
+    player.on_ground = False
 
-    # Fundo
     background = load_image("mabel/imagem level 1.jpg").convert()
     background = pygame.transform.scale(background, screen.get_size())
 
@@ -18,23 +19,17 @@ def run(screen):
 
     # Plataformas
     platforms = pygame.sprite.Group()
-    platform1_surface = load_image("mabel/plataforma1_limpa.png")
-    platform2_surface = load_image("mabel/plataforma2_limpa.png")
-    platform3_surface = load_image("mabel/plataforma3_limpa.png")
-    
+    platform_surface = load_image("mabel/plataforma3_limpa.png")
+    small_w, small_h = 50, 30
+    large_w, large_h = 180, 60
 
-    # Ajuste de tamanho
-    small_width, small_height = 50, 30
-    large_width, large_height = 180, 60
+    platform2 = Platform(pygame.transform.scale(platform_surface, (large_w, large_h)), screen_width - large_w - 60, HEIGHT - 180)
+    platform3 = Platform(pygame.transform.scale(platform_surface, (large_w, large_h)), screen_width // 2 - large_w // 2, HEIGHT - 260)
+    platform4 = Platform(pygame.transform.scale(platform_surface, (large_w, large_h)), 60, HEIGHT - 180)
 
-    platform2 = Platform(pygame.transform.scale(platform3_surface, (large_width, large_height)), screen_width - large_width - 60, HEIGHT - 180)
-    platform3 = Platform(pygame.transform.scale(platform3_surface, (large_width, large_height)), screen_width // 2 - large_width // 2, HEIGHT - 260)
-    
+    platforms.add(platform2, platform3, platform4)
 
-    platform4 = Platform(pygame.transform.scale(platform3_surface, (large_width, large_height)), 60, HEIGHT - 180)
-    platforms.add( platform2, platform3, platform4)
-
-    # Verifica colisão inicial com chão/plataforma
+    # Verificación inicial de colisión
     for plat in platforms:
         if player.rect.colliderect(plat.rect):
             player.rect.bottom = plat.rect.top
@@ -42,13 +37,38 @@ def run(screen):
             player.on_ground = True
             break
 
+    # Pantalla de pausa
+    pause_screen = PauseScreen(screen)
+
     running = True
     while running:
+        dt = clock.tick(FPS) / 1000
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 'quit'
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return 'menu'
+            if pause_screen.active:
+                action = pause_screen.handle_event(event)
+                if action == 'continue':
+                    pause_screen.hide()
+                elif action == 'menu':
+                    return 'menu'
+                elif action == 'level_select':
+                    return 'level_select'
+            else:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    pause_screen.show()
+
+        if pause_screen.active:
+            pause_screen.update(dt)
+            screen.blit(background, (0, 0))
+            platforms.update()
+            for p in platforms:
+                p.draw(screen)
+            player.draw(screen)
+            pause_screen.draw()
+            pygame.display.flip()
+            continue
 
         keys = pygame.key.get_pressed()
         player.update(keys)
@@ -65,11 +85,10 @@ def run(screen):
             player.vel_y = 0
             player.on_ground = True
 
-        # Reforça detecção de chão logo ao início
         if player.rect.bottom == screen_height and not any(player.rect.colliderect(p.rect) for p in platforms):
             player.on_ground = True
 
-        # Colisão com plataformas - lógica mais permissiva
+        # Colisiones
         collided = False
         for plat in platforms:
             if player.vel_y > 0:
@@ -86,17 +105,15 @@ def run(screen):
                     collided = True
                     break
 
-        if not collided:
-            # Só considera que está no ar se não está encostando no chão
-            if player.rect.bottom < screen_height:
-                player.on_ground = False
+        if not collided and player.rect.bottom < screen_height:
+            player.on_ground = False
 
-        # Desenho
+
+
+        # Render
         screen.blit(background, (0, 0))
         platforms.update()
         for p in platforms:
             p.draw(screen)
-
         player.draw(screen)
         pygame.display.flip()
-        clock.tick(FPS)
