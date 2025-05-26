@@ -8,9 +8,9 @@ from src.objects.fireball import Fireball
 from src.utils.asset_loader import load_image
 from config import *
 
-from src.screens.game_over_screen import GameOverScreen
 from src.screens.pause_screen import PauseScreen
-from src.screens.level_complete_screen import LevelCompleteScreen
+from src.screens.game_over import tela_game_over
+from src.screens.winner import tela_vitoria
 
 def run(screen):
     pygame.mixer.init()
@@ -39,9 +39,7 @@ def run(screen):
     paused = False
     level_complete = False  
 
-    game_over_screen = GameOverScreen(screen)
     pause_screen = PauseScreen(screen)
-    level_complete_screen = LevelCompleteScreen(screen)
     
     platforms = pygame.sprite.Group()
     
@@ -81,36 +79,14 @@ def run(screen):
                 return 'quit'
 
             if game_over:
-                result = game_over_screen.handle_event(event)
-                if result == 'reset':
-                    player = Player(player_x, player_y)                    
-                    enemies.empty()
-                    bills.empty()  
-                    pygame.mixer.music.play(-1)
-                    bill = Bill(WIDTH // 2, 150, phase=0)
-                    fireballs.empty()
-                    bills.add(bill)
-                    lives = 3
-                    enemy_spawn_timer = 0
-                    game_over = False
-                elif result == 'menu':
+                result = tela_game_over(screen)
+                if result == 'menu':
                     pygame.mixer.music.stop()
                     return 'menu'
                     
             elif level_complete:
-                result = level_complete_screen.handle_event(event)
-                if result == 'restart':
-                    player = Player(player_x, player_y)
-                    enemies.empty()
-                    fireballs.empty()
-                    pygame.mixer.music.play(-1)
-                    bills.empty()
-                    bill = Bill(WIDTH // 2, 150, phase=0)
-                    bills.add(bill)
-                    lives = 3
-                    enemy_spawn_timer = 0
-                    level_complete = False
-                elif result == 'menu':
+                result = tela_vitoria(screen)
+                if result == 'menu':
                     pygame.mixer.music.stop()
                     return 'menu'
 
@@ -155,6 +131,7 @@ def run(screen):
                             enemies.empty()
                             player.projectiles.clear()
                             player.special_attacks.clear()
+                            pygame.mixer.music.stop()
                     fireball.kill()
             
             if player.rect.y >= HEIGHT-150: 
@@ -302,12 +279,6 @@ def run(screen):
 
         if paused:
             pause_screen.draw()
-
-        if game_over:
-            game_over_screen.draw()
-            
-        if level_complete:
-            level_complete_screen.draw()
             
         for i in range(lives):
             x = 10 + i * (heart_image.get_width() + 10)
