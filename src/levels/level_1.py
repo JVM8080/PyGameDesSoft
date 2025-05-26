@@ -7,6 +7,8 @@ from src.objects.gnomo_inimigo import GnomoInimigo
 from src.objects.porquinho import Porquinho
 
 from src.screens.pause_screen import PauseScreen
+from src.screens.game_over import tela_game_over
+from src.screens.winner import tela_vitoria
 
 
 def run(screen):
@@ -16,6 +18,9 @@ def run(screen):
 
     player = Player(100, HEIGHT - 350)
     player.on_ground = False
+    
+    lives = 8
+    heart_image = load_image("level_3/vida.png", size=(32, 32))
 
     background = load_image("mabel/imagem level 1.jpg").convert()
     background = pygame.transform.scale(background, screen.get_size())
@@ -100,7 +105,6 @@ def run(screen):
 
         now = pygame.time.get_ticks()
 
-        # Porquinho a cada 4s sobre plataforma ou chão
         if now - last_spawn_time > intervalo_spawn:
             import random
             spawnou = False
@@ -128,7 +132,22 @@ def run(screen):
         colididos = pygame.sprite.spritecollide(player, porcos_group, True)
         coletados += len(colididos)
         if coletados >= 20:
-            return 'level_2'
+            tela_vitoria(screen)
+            result = tela_vitoria(screen)
+            if result == 'menu':
+                pygame.mixer.music.stop()
+                return 'menu'
+        
+        for gnomo in gnomo_group.copy():
+            if player.rect.colliderect(gnomo.rect):
+                gnomo_group.remove(gnomo)
+                lives -= 1
+                if lives <= 0:
+                    result = tela_game_over(screen)
+                    if result == 'menu':
+                        return 'menu'
+                    elif result == 'level_select':
+                        return 'level_select' 
 
         # Limites da Mabel
         if player.rect.left < 0:
@@ -164,12 +183,9 @@ def run(screen):
 
         if not collided and player.rect.bottom < screen_height:
             player.on_ground = False
-        # Atualizações
+            
         gnomo_group.update()
         porcos_group.update()
-
-
-
 
         # Render
         screen.blit(background, (0, 0))
@@ -179,6 +195,10 @@ def run(screen):
         player.draw(screen)
         gnomo_group.draw(screen)
         porcos_group.draw(screen)
+
+        # Mostrar vidas
+        for i in range(lives):
+            screen.blit(heart_image, (WIDTH - (i + 1) * 40, 20))
 
         texto_porcos = font_porcos.render(f"Porcos: {coletados}/20", True, (255, 255, 255))
         screen.blit(texto_porcos, (20, 20))
