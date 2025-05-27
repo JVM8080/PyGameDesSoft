@@ -1,6 +1,7 @@
 import pygame
 from src.utils.asset_loader import load_image
 
+
 def main_menu(screen):
     clock = pygame.time.Clock()
 

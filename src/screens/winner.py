@@ -6,7 +6,8 @@ from pygame import mixer
 def tela_vitoria(screen):
     VITORIA_SOUND = mixer.Sound("assets/sounds/resultados/victory.wav")
     VITORIA_SOUND.set_volume(0.6)
-    VITORIA_SOUND.play(loops=-1)
+    canal_vitoria = pygame.mixer.Channel(1)
+    canal_vitoria.play(VITORIA_SOUND, loops=-1)
 
     # Carregar os frames da animação
     frames = []
@@ -30,6 +31,7 @@ def tela_vitoria(screen):
                 exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    canal_vitoria.stop()
                     return 'menu'
 
         now = pygame.time.get_ticks()

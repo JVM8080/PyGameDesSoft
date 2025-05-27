@@ -479,6 +479,7 @@ class MoneyBag(pygame.sprite.Sprite):
 
         # Colisão com o jogador
         if self.rect.colliderect(self.player.rect):
+            COLETAR_DINHEIRO_SOUND.play()
             self.player.dinheiro += 1
             if self.player.dinheiro >= 25:
                 print("🎉 Você venceu!")
