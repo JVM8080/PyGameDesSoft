@@ -1,6 +1,9 @@
 import pygame
 
 def level_select(screen):
+    pygame.mixer.init()  
+    pygame.mixer.music.load("assets/sounds/gravity_falls_abertura1.mp3")
+    pygame.mixer.music.play()  
     font = pygame.font.SysFont(None, 50)
 
     background = pygame.image.load("assets/images/menu/level select.png").convert()
