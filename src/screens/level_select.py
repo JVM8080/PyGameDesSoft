@@ -1,6 +1,14 @@
 import pygame
+from pygame import mixer
+
+
 
 def level_select(screen):
+
+    mixer.music.load("assets/sounds/menu/select level.ogg")
+    mixer.music.set_volume(0.6)
+    mixer.music.play(-1)
+
     font = pygame.font.SysFont(None, 50)
 
     background = pygame.image.load("assets/images/menu/level select.png").convert()
@@ -32,6 +40,7 @@ def level_select(screen):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for i, rect in enumerate(level_buttons):
                     if rect.collidepoint(event.pos):
+                        mixer.music.stop()
                         return 'game', i + 1
 
         pygame.display.flip()
