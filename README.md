@@ -28,7 +28,7 @@ Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte
 
 ## Video do jogo funcionando:
 
-Link: [Pygame Gravity Falls – 100% Complete [All Leves] | Julián Vargas – Sophia Kalil – Felipe Campos](https://youtu.be/4lXOMEJS7yI)
+Link: [Pygame Gravity Falls – 100% Complete [All Levels] | Julián Vargas – Sophia Kalil – Felipe Campos](https://youtu.be/4lXOMEJS7yI)
 
 ## Estrutura de pastas e arquivos
 
