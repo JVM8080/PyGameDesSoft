@@ -68,4 +68,4 @@ def main_menu(screen):
         pygame.display.flip()
 
         # Controla o FPS do menu (60 quadros por segundo)
-        clock.tick(60)
+        clock.tick(FPS)

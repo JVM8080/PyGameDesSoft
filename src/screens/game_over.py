@@ -40,4 +40,4 @@ def tela_game_over(screen):
         # Exibe a imagem de Game Over na tela
         screen.blit(gameover_img, (0, 0))
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(FPS)
