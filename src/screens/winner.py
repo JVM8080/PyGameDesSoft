@@ -1,11 +1,11 @@
 import pygame
 import os
-from config import WIDTH, HEIGHT
+from config import *
 from pygame import mixer
 
 def tela_vitoria(screen):
     VITORIA_SOUND = mixer.Sound("assets/sounds/resultados/victory.wav")
-    VITORIA_SOUND.set_volume(0.6)
+    VITORIA_SOUND.set_volume(SOUND_VOLUME_MUSIC)
     canal_vitoria = pygame.mixer.Channel(1)
     canal_vitoria.play(VITORIA_SOUND, loops=-1)
 

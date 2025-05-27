@@ -1,12 +1,13 @@
 import pygame
 from pygame import mixer
+from config import *
 
 
 
 def level_select(screen):
 
     mixer.music.load("assets/sounds/menu/select level.ogg")
-    mixer.music.set_volume(0.6)
+    mixer.music.set_volume(SOUND_VOLUME_MUSIC)
     mixer.music.play(-1)
 
     font = pygame.font.SysFont(None, 50)

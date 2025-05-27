@@ -1,5 +1,5 @@
 import pygame
-from config import HEIGHT, WIDTH, FPS
+from config import *
 from src.objects.player_mable import Player
 from src.utils.asset_loader import load_image
 from src.objects.platforma_level1 import Platform
@@ -14,6 +14,7 @@ from src.screens.winner import tela_vitoria
 def run(screen):
     pygame.mixer.init()
     pygame.mixer.music.load("assets/sounds/som-level1.mp3")
+    pygame.mixer.music.set_volume(SOUND_VOLUME_MUSIC)
     pygame.mixer.music.play(-1)  # -1 = loop infinito
 
     clock = pygame.time.Clock()
@@ -84,7 +85,9 @@ def run(screen):
                 return 'quit'
             if pause_screen.active:
                 action = pause_screen.handle_event(event)
+                pygame.mixer.music.pause()
                 if action == 'continue':
+                    pygame.mixer.music.unpause()
                     pause_screen.hide()
                 elif action == 'menu':
                     pygame.mixer.music.stop()
