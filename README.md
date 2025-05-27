@@ -24,7 +24,7 @@ Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte
    python main.py
    ```
 
-Pd: O jogo foi feito para controle de Xbox One.
+**Pd: O jogo foi feito para controle de Xbox One.**
 
 ## Video do jogo funcionando:
 
@@ -141,3 +141,4 @@ Exemplo: A função `funcao-do-jogo()` do arquivo   `diretorio/arquivo.py` foi d
 * Os recursos gráficos foram obtidos no link a seguir: [Fravity Falls Pinesquest 2d](https://novastarlyght.itch.io/gravity-falls-pinesquest-2d).
 * Alguns recursos de audio foram usados do jogo [Cuphead ](https://cupheadgame.com/)desarrollado pela empresa [Studio MDHR](https://www.google.com/search?sca_esv=a983052df2b98a8d&rlz=1C1ONGR_esCO1042CO1042&sxsrf=AE3TifMBRX8On7N2blnc0Xh4W1OVJZTaXg:1748368410965&q=Studio+MDHR&si=AMgyJEs9DArPE9xmb5yVYVjpG4jqWDEKSIpCRSjmm88XZWnGNdOJzdIqw1FvSSFjTPqRvqXkvD8Mz6-uTHgr2UaM157q_jPUncigFsVSpKi8ORSqiwPjQtRjZYUIA3j_N44YFxYHGDnctAu1ltw4j97MeAUW1Fga3T38s-sjsS2SkGFcPORI3urthU6nytiAYmI-hYoXuxVTgJD0f5FnTMEMU69EMC3omg%3D%3D&sa=X&ved=2ahUKEwinysnwm8SNAxVmqZUCHVd2CCAQmxN6BAglEAI).
 * Alguns recursos de audio foram usados do jogo [Geometry Dash](https://www.robtopgames.com/) desarrollado pela empresa [RobTop Games](https://www.robtopgames.com/).
+* Alguns membros do trabalho usaram [Github Copilot](https://github.com/features/copilot) e [Windsuft AI](https://windsurf.com/editor) como IA de ajuda durante o desarrollo do jogo.
