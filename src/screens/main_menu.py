@@ -1,13 +1,13 @@
 import pygame
 from src.utils.asset_loader import load_image
 from pygame import mixer
-
+from config import *
 
 
 def main_menu(screen):
 
     mixer.music.load("assets/sounds/menu/introducao.ogg")
-    mixer.music.set_volume(0.6)
+    mixer.music.set_volume(SOUND_VOLUME_MUSIC)
     mixer.music.play(-1)  # -1 = loop infinito
 
 

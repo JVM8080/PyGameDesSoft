@@ -15,7 +15,7 @@ from src.screens.pause_screen import PauseScreen
 def run(screen):
     pygame.mixer.init()
     pygame.mixer.music.load("assets/sounds/level2_audio/level2.ogg")
-    pygame.mixer.music.set_volume(1)  # volume de 0.0 a 1.0
+    pygame.mixer.music.set_volume(SOUND_VOLUME_MUSIC)  # volume de 0.0 a 1.0
     pygame.mixer.music.play(-1)  # -1 faz repetir infinitamente
     som_morte = pygame.mixer.Sound("assets/sounds/level2_audio/stan_death.wav")
     som_morte.set_volume(0.5)  # volume de 0.0 a 1.0
@@ -93,23 +93,17 @@ def run(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            if not jogador_morreu and event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                pygame.mixer.music.stop()
-                return 'menu'
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.JOYBUTTONDOWN and event.button == 7:
                 is_paused = not is_paused
                 if is_paused:
+                    pygame.mixer.music.pause()
                     pause_screen.show()
                 else:
+                    pygame.mixer.music.unpause()
                     pause_screen.hide()
 
-            if event.type == pygame.JOYBUTTONDOWN and event.button == 7:  
-                is_paused = not is_paused
-                if is_paused:
-                    pause_screen.show()
-                else:
-                    pause_screen.hide()
 
             if is_paused:
                 action = pause_screen.handle_event(event)

@@ -15,7 +15,7 @@ from src.screens.winner import tela_vitoria
 def run(screen):
     pygame.mixer.init()
     pygame.mixer.music.load("assets/sounds/level_3.mp3")  
-    pygame.mixer.music.set_volume(0.1)  
+    pygame.mixer.music.set_volume(SOUND_VOLUME_MUSIC)  
     pygame.mixer.music.play(-1)
     
     clock = pygame.time.Clock()
@@ -78,12 +78,14 @@ def run(screen):
                 return 'quit'
 
             if game_over:
+                pygame.mixer.music.stop()
                 result = tela_game_over(screen)
                 if result == 'menu':
                     pygame.mixer.music.stop()
                     return 'menu'
                     
             elif level_complete:
+                pygame.mixer.music.stop()
                 result = tela_vitoria(screen)
                 if result == 'menu':
                     pygame.mixer.music.stop()

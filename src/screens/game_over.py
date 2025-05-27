@@ -8,7 +8,7 @@ def tela_game_over(screen):
     global GAMEOVER_SOUND
     if not GAMEOVER_SOUND:
         GAMEOVER_SOUND = mixer.Sound("assets/sounds/resultados/gameover.ogg")
-        GAMEOVER_SOUND.set_volume(0.6)
+        GAMEOVER_SOUND.set_volume(SOUND_VOLUME_MUSIC)
     canal_gameover = pygame.mixer.Channel(2)
     canal_gameover.play(GAMEOVER_SOUND, loops=-1)
 
