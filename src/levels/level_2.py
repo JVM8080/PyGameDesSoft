@@ -153,7 +153,7 @@ def run(screen):
                 enemy.frame_index = 0
                 enemy.last_update = pygame.time.get_ticks()
                 enemy.frame_speed = 150  # ou outro valor adequado
-                diagrama = DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.3)
+                diagrama = DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.5)
                 diagrama_animado_group.add(diagrama)
                 diagramas_pendentes.append(diagrama)
                 print("⚠️ Zumbi ativou o diagrama e morreu no fogo!")
