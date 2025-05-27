@@ -1,10 +1,15 @@
 import pygame
 from src.utils.asset_loader import load_image
+from pygame import mixer
+
+
 
 def main_menu(screen):
-    pygame.mixer.init()  
-    pygame.mixer.music.load("assets/sounds/gravity_falls_abertura.mp3")
-    pygame.mixer.music.play()  
+
+    mixer.music.load("assets/sounds/menu/introducao.ogg")
+    mixer.music.set_volume(0.6)
+    mixer.music.play(-1)  # -1 = loop infinito
+
 
     clock = pygame.time.Clock()
 
@@ -34,7 +39,8 @@ def main_menu(screen):
                 return "quit"
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if button_rect.collidepoint(mouse_pos):
-                    pygame.mixer.music.stop() 
+                    mixer.music.stop()
+
                     return "level_select"
 
         screen.blit(background, (0, 0))

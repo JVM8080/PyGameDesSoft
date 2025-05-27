@@ -13,6 +13,13 @@ from src.screens.pause_screen import PauseScreen
 
 
 def run(screen):
+    pygame.mixer.init()
+    pygame.mixer.music.load("assets/sounds/level2_audio/level2.ogg")
+    pygame.mixer.music.set_volume(1)  # volume de 0.0 a 1.0
+    pygame.mixer.music.play(-1)  # -1 faz repetir infinitamente
+    som_morte = pygame.mixer.Sound("assets/sounds/level2_audio/stan_death.wav")
+    som_morte.set_volume(0.5)  # volume de 0.0 a 1.0
+
     clock = pygame.time.Clock()
     player = Player(100, HEIGHT - 150)
 
@@ -86,6 +93,9 @@ def run(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+            if not jogador_morreu and event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                pygame.mixer.music.stop()
+                return 'menu'
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_paused = not is_paused
@@ -135,6 +145,8 @@ def run(screen):
         screen.blit(totem.image, (WIDTH - 120, 130))
 
         if jogador_morreu:
+            pygame.mixer.music.stop()
+            som_morte.play()
             tempo_morrido = pygame.time.get_ticks() - momento_morte
             desenhar_vidas(screen, player.vida)
             player_group.draw(screen)
@@ -158,11 +170,6 @@ def run(screen):
             momento_morte = pygame.time.get_ticks()
             print("🔥 O jogador morreu no fogo")
 
-        money_group.update()
-        resultado = money_group.update()
-        if resultado == 'win':
-            return tela_vitoria(screen)
-
         player_group.draw(screen)
         money_group.draw(screen)
         desenhar_vidas(screen, player.vida)
@@ -173,8 +180,10 @@ def run(screen):
         for money in money_group:
             resultado = money.update()
             if resultado == 'win':
-                pygame.display.flip()
-                pygame.time.delay(3000)
+                pygame.mixer.music.stop()
+                pygame.display.flip()  # Atualiza a tela uma última vez
+                pygame.time.delay(2000)  # Espera 3 segundos travado
+
                 return tela_vitoria(screen)
 
         enemies.update()
@@ -185,8 +194,9 @@ def run(screen):
                 enemy.state = "dead"
                 enemy.frame_index = 0
                 enemy.last_update = pygame.time.get_ticks()
-                enemy.frame_speed = 150
-                diagrama = DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.3)
+                enemy.frame_speed = 150  # ou outro valor adequado
+                diagrama = DiagramaAnimado("assets/images/level2/diagrama", pos=(WIDTH // 2, 180), frame_speed=50, scale=0.5)
+
                 diagrama_animado_group.add(diagrama)
                 diagramas_pendentes.append(diagrama)
                 print("⚠️ Zumbi ativou o diagrama e morreu no fogo!")

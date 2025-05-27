@@ -5,12 +5,16 @@ from pygame import mixer
 from src.objects.power import PoderBase
 
 JUMP_SOUND = None
+TIRO_SOUND = None
+DANO_SOUND = None
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
 
         global JUMP_SOUND
+        global TIRO_SOUND
+        global DANO_SOUND
 
         self.image_idle = load_image("level2/stan/stan parado.png").convert_alpha()
         self.anim_left = load_image('level2/stan/stan indo pra esquerda.png').convert_alpha()
@@ -49,7 +53,15 @@ class Player(pygame.sprite.Sprite):
         self.moeda_frame_height = self.moeda_spritesheet.get_height()
 
         if not JUMP_SOUND:
-            JUMP_SOUND = mixer.Sound("assets/sounds/jump.mp3")
+            JUMP_SOUND = mixer.Sound("assets/sounds/dipper-jump.mp3")
+        
+        if not TIRO_SOUND:
+            TIRO_SOUND = mixer.Sound("assets/sounds/level2_audio/Coin.ogg")
+            TIRO_SOUND.set_volume(0.4)
+
+        if not DANO_SOUND:
+            DANO_SOUND = mixer.Sound("assets/sounds/level2_audio/enemy_attack.ogg")
+            DANO_SOUND.set_volume(0.5)
 
         # Animação e flags
         self.last_update = pygame.time.get_ticks()
@@ -122,6 +134,7 @@ class Player(pygame.sprite.Sprite):
                 frame_height=self.moeda_frame_height
             )
             self.poder_group.add(moeda)
+            TIRO_SOUND.play()
 
         self.shoot_pressed_last_frame = shoot_button
 
@@ -165,6 +178,7 @@ class Player(pygame.sprite.Sprite):
             if enemy.state == "attack":
                 if not hasattr(enemy, "last_hit") or pygame.time.get_ticks() - enemy.last_hit > 500:
                     self.vida -= 1
+                    DANO_SOUND.play()
                     enemy.last_hit = pygame.time.get_ticks()
                     print(f"Player levou dano! Vida: {self.vida}")
                 if self.vida <= 0:

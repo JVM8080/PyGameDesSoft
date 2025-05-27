@@ -3,6 +3,10 @@ import random
 from config import *
 from src.screens.winner import tela_vitoria
 import os
+from pygame import mixer
+
+COLETAR_DINHEIRO_SOUND = None
+VITORIA_SOUND = None
 
 class Portal(pygame.sprite.Sprite):
     def __init__(self, x, y, spritesheet, frame_width=24, frame_height=32, frame_count=8, frame_speed=100, scale_size=None):
@@ -443,6 +447,12 @@ class ZombieSpawn(pygame.sprite.Sprite):
 class MoneyBag(pygame.sprite.Sprite):
     def __init__(self, image_sheet, platforms, player, frame_count=8, frame_width=32, frame_height=32, scale=2):
         super().__init__()
+
+        global COLETAR_DINHEIRO_SOUND
+        if not COLETAR_DINHEIRO_SOUND:
+            COLETAR_DINHEIRO_SOUND = mixer.Sound("assets/sounds/level2_audio/Money.ogg")
+            COLETAR_DINHEIRO_SOUND.set_volume(0.5)
+
         self.frames = []
         for i in range(frame_count):
             frame = image_sheet.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height))
@@ -469,6 +479,7 @@ class MoneyBag(pygame.sprite.Sprite):
 
         # Colisão com o jogador
         if self.rect.colliderect(self.player.rect):
+            COLETAR_DINHEIRO_SOUND.play()
             self.player.dinheiro += 1
             if self.player.dinheiro >= 25:
                 print("🎉 Você venceu!")

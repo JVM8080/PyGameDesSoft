@@ -1,7 +1,17 @@
 import pygame
 from config import *
+from pygame import mixer
+
+GAMEOVER_SOUND = None  
 
 def tela_game_over(screen):
+    global GAMEOVER_SOUND
+    if not GAMEOVER_SOUND:
+        GAMEOVER_SOUND = mixer.Sound("assets/sounds/resultados/gameover.ogg")
+        GAMEOVER_SOUND.set_volume(0.6)
+    canal_gameover = pygame.mixer.Channel(2)
+    canal_gameover.play(GAMEOVER_SOUND, loops=-1)
+
     gameover_img = pygame.image.load("assets/images/GameOver.png").convert_alpha()
     gameover_img = pygame.transform.scale(gameover_img, (WIDTH, HEIGHT))
 
@@ -13,6 +23,7 @@ def tela_game_over(screen):
                 exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    canal_gameover.stop()
                     return 'menu'
 
         screen.blit(gameover_img, (0, 0))
