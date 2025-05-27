@@ -1,4 +1,4 @@
-# Pygame DesSoft
+# Pygame DesSoft – Gravity Falls
 
 ### Integrantes do grupo:
 
@@ -6,8 +6,29 @@
 * Sophia Montecinos Kalil.
 * Felipe Campos Leite Lima.
 
-
 Este projeto é um jogo digital desenvolvido por estudantes do Insper como parte de uma atividade acadêmica. Foi implementado em Python utilizando a biblioteca Pygame, com o objetivo de explorar conceitos de programação, lógica de jogos e design interativo. Todos os recursos gráficos e sonoros utilizados foram obtidos de fontes livres e abertas disponíveis na internet, respeitando as licenças de uso e promovendo o uso ético de conteúdo digital.
+
+## Como executar o jogo:
+
+1. Ative o ambiente virtual com as bibliotecas necessárias (consulte o passo 1 mais abaixo).
+2. Edite o arquivo `config.py` para ajustar suas preferências de áudio e desempenho. As variáveis relevantes são:
+
+   ```
+   FPS = 90
+   SOUND_VOLUME_SFX = 0.3
+   SOUND_VOLUME_MUSIC = 0.5
+   ```
+3. Estando na pasta raiz do repositório, execute o jogo com o seguinte comando no terminal, ou abra o arquivo `main.py` com o VS Code e execute por lá:
+
+   ```
+   python main.py
+   ```
+
+Pd: O jogo foi feito para controle de Xbox One.
+
+## Video do jogo funcionando:
+
+Link: [Pygame Gravity Falls – 100% Complete [All Leves] | Julián Vargas – Sophia Kalil – Felipe Campos](https://youtu.be/4lXOMEJS7yI)
 
 ## Estrutura de pastas e arquivos
 
@@ -34,11 +55,13 @@ PyGameDesSoft/
 │   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
 │   │   ├── player.py      # Classe do jogador principal
 │   │   └── obstacles.py   # Classe dos obstáculos
+│   │   └── ...
 │   │
 │   ├── utils/             # Utilitários do jogo
 │   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
 │   │   ├── collision.py   # Sistema de detecção de colisões
 │   │   └── asset_loader.py # Carregador de recursos (imagens, sons)
+│   │   └── ...
 │   │
 │   ├── levels/            # Níveis do jogo
 │   │   ├── __init__.py    # Arquivo __init__.py para permitir a importação dos módulos da pasta.
@@ -115,5 +138,6 @@ Exemplo: A função `funcao-do-jogo()` do arquivo   `diretorio/arquivo.py` foi d
 
 * A estrutura de pastas e arquivos foi obtida pela IA [chat.deepseek.com](chat.deepseek.com).
 * Os arquivos iniciais do repositorio foram obtidos pela IA [chatgpt.com](https://chatgpt.com/).
-* Os recursos gráficos foram obtidos no link a seguir: https://novastarlyght.itch.io/gravity-falls-pinesquest-2d
-
+* Os recursos gráficos foram obtidos no link a seguir: [Fravity Falls Pinesquest 2d](https://novastarlyght.itch.io/gravity-falls-pinesquest-2d).
+* Alguns recursos de audio foram usados do jogo [Cuphead ](https://cupheadgame.com/)desarrollado pela empresa [Studio MDHR](https://www.google.com/search?sca_esv=a983052df2b98a8d&rlz=1C1ONGR_esCO1042CO1042&sxsrf=AE3TifMBRX8On7N2blnc0Xh4W1OVJZTaXg:1748368410965&q=Studio+MDHR&si=AMgyJEs9DArPE9xmb5yVYVjpG4jqWDEKSIpCRSjmm88XZWnGNdOJzdIqw1FvSSFjTPqRvqXkvD8Mz6-uTHgr2UaM157q_jPUncigFsVSpKi8ORSqiwPjQtRjZYUIA3j_N44YFxYHGDnctAu1ltw4j97MeAUW1Fga3T38s-sjsS2SkGFcPORI3urthU6nytiAYmI-hYoXuxVTgJD0f5FnTMEMU69EMC3omg%3D%3D&sa=X&ved=2ahUKEwinysnwm8SNAxVmqZUCHVd2CCAQmxN6BAglEAI).
+* Alguns recursos de audio foram usados do jogo [Geometry Dash](https://www.robtopgames.com/) desarrollado pela empresa [RobTop Games](https://www.robtopgames.com/).
