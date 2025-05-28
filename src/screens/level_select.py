@@ -5,7 +5,7 @@ from config import *
 def level_select(screen):
     # Carrega e toca a música de fundo da tela de seleção de nível em loop
     mixer.music.load("assets/sounds/menu/select level.ogg")
-    mixer.music.set_volume(0.7)
+    mixer.music.set_volume(SOUND_VOLUME_MUSIC)
     mixer.music.play(-1)
 
     # Define a fonte padrão com tamanho 50 (não está sendo usada neste trecho)
