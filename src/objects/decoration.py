@@ -46,7 +46,7 @@ def desenhar_vidas(surface, vidas):
     if vida_img is None:
         # Carrega e redimensiona a imagem da barra de vidas apenas uma vez
         vida_img = pygame.image.load("assets/images/level2/vidas.png").convert_alpha()
-        vida_img = pygame.transform.scale(vida_img, (430, 60))
+        vida_img = pygame.transform.scale(vida_img, (300, 32))
 
     total_coracoes = 10  # A imagem da barra de vidas tem 10 corações
     coracao_largura = vida_img.get_width() // total_coracoes  # Largura de cada coração
