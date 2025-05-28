@@ -46,7 +46,7 @@ class Player(pygame.sprite.Sprite):
         self.last_shoot_direction = -1
 
         # Estado do jogador
-        self.vida = 10
+        self.vida = 7
         self.dinheiro = 0 
         self.enemy_group = pygame.sprite.Group()
         self.morto_no_fogo = False

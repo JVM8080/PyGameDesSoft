@@ -138,11 +138,19 @@ class FlyingEnemy(pygame.sprite.Sprite):
                 continue
 
             if self.rect.colliderect(poder.rect):
-                # Verifica se a moeda está vindo de frente
+                # Verifica se o tiro está realmente vindo na direção certa
                 if poder.direction == 1 and poder.rect.centerx < self.rect.centerx:
-                    continue  # moeda indo pra direita mas o inimigo está à esquerda
+                    continue
                 if poder.direction == -1 and poder.rect.centerx > self.rect.centerx:
-                    continue  # moeda indo pra esquerda mas o inimigo está à direita
+                    continue
+
+                # Verifica distância real entre o centro do poder e do inimigo
+                distancia_x = abs(self.rect.centerx - poder.rect.centerx)
+                distancia_y = abs(self.rect.centery - poder.rect.centery)
+
+                # Evita que o inimigo seja atingido de muito longe
+                if distancia_x > 50 or distancia_y > 50:
+                    continue
 
                 # Toma dano
                 self.vida -= 1
